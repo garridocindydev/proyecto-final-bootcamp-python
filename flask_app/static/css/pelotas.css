@@ -1,0 +1,16 @@
+.pelota {
+  width: 100px;
+  height: 100px;
+  background-color: red;
+  border-radius: 50%;
+}
+
+.contenedor-pelotas {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+h1 {
+  text-align: center;
+}

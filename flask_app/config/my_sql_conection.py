@@ -1,17 +1,16 @@
 import os  # Importamos librería para acceder a variables de entorno
 import pymysql.cursors  # Utilizamos un cursos para interactuar con BD
 
-
-class MySQLConnection:  # Clase que permite generar instancia de conexión con BD
+class MySQLConnection: #Clase que permite generar instancia de conexión con BD
     def __init__(self, db):
-        connection = pymysql.connect(host=os.getenv('DB_HOST'),  # Cambia el host
-                                     user=os.getenv('user'),  # Cambia el usuario y contraseña
-                                     password=os.getenv('password'),
-                                     db=db,
-                                     charset='utf8',
-                                     cursorclass=pymysql.cursors.DictCursor,
-                                     autocommit=True)
-        self.connection = connection  # Establecemos conexión con BD
+        connection = pymysql.connect(host = 'localhost',
+                                    user = 'root', # Cambia el usuario y contraseña
+                                    password = 'root', 
+                                    db = db,
+                                    charset = 'utf8mb4',
+                                    cursorclass = pymysql.cursors.DictCursor,
+                                    autocommit = True)
+        self.connection = connection 
 
     # El método que se encarga de la consulta
 

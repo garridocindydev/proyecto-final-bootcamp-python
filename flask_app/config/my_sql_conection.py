@@ -9,12 +9,12 @@ class MySQLConnection: #Clase que permite generar instancia de conexión con BD
     def __init__(self, db):
         print("Initializing MySQLConnection...")
         print("os.getenv('HOST')", os.getenv('HOST'))
-        print("os.getenv('USER')", os.getenv('USER'))
-        print("os.getenv('PASSWORD')", os.getenv('PASSWORD'))
-    
+        print("os.getenv('USER')", os.getenv('USER_DB'))
+        print("os.getenv('PASSWORD')", os.getenv('PASSWORD_DB'))
+
         connection = pymysql.connect(host = os.getenv("HOST"),
-                                    user = os.getenv("USER"), # Cambia el usuario y contraseña
-                                    password = os.getenv("PASSWORD"), 
+                                    user = os.getenv("USER_DB"), # Cambia el usuario y contraseña
+                                    password = os.getenv("PASSWORD_DB"), 
                                     db = db,
                                     charset = 'utf8mb4',
                                     cursorclass = pymysql.cursors.DictCursor,

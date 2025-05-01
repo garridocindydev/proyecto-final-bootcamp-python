@@ -36,6 +36,8 @@ def login():
     
     if usuario.rol == 'admin':
         return redirect('/admin/usuarios')
+    elif usuario.rol == 'financiera':
+        return redirect('/financiera/juicios')
     return redirect('/dashboard')
 
 @app.route('/dashboard')

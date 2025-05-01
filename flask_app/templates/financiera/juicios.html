@@ -8,7 +8,12 @@
 </head>
 <body>
     <div class="container mt-4">
-        <h2>Gestión de Juicios</h2>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Gestión de Juicios</h2>
+            <form action="/logout" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-outline-danger">Cerrar Sesión</button>
+            </form>
+        </div>
         
         <!-- Formulario para crear nuevo juicio -->
         <div class="card mb-4">
@@ -16,7 +21,7 @@
                 <h4>Crear Nuevo Juicio</h4>
             </div>
             <div class="card-body">
-                <form action="/crear_juicio" method="POST">
+                <form action="/financiera/juicios/crear" method="POST">
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label for="id_pagare" class="form-label">ID Pagaré</label>
@@ -63,7 +68,7 @@
                             <td>{{ juicio.id_pagare }}</td>
                             <td>{{ juicio.rol }}</td>
                             <td>{{ juicio.tribunal }}</td>
-                            <td>{{ juicio.estudio if juicio.estudio else 'Sin asignar' }}</td>
+                            <td>{{ juicio.estudio.nombre if juicio.estudio else 'Sin asignar' }}</td>
                             <td>${{ juicio.cuantia }}</td>
                             <td>{{ juicio.estado }}</td>
                             <td>
@@ -89,7 +94,7 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form action="/asignar_juicio/{{ juicio.id }}" method="POST">
+                                        <form action="/financiera/juicios/asignar/{{ juicio.id }}" method="POST">
                                             <div class="mb-3">
                                                 <label for="estudio" class="form-label">Seleccionar Estudio</label>
                                                 <select class="form-select" name="estudio" required>

@@ -32,8 +32,12 @@ CREATE TABLE IF NOT EXISTS usuarios (
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     rol ENUM('admin', 'financiera', 'abogado', 'incautador') NOT NULL,
+    estudio_id INT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (estudio_id) REFERENCES estudios(id),
+    -- Aseguramos que solo los abogados tengan estudio asignado
+    CONSTRAINT chk_abogado_estudio CHECK (rol != 'abogado' OR (rol = 'abogado' AND estudio_id IS NOT NULL))
 );
 
 -- Crear el usuario administrador inicial

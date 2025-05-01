@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, session, flash
 from flask_app import app
 from flask_app.models.juicio import Juicio
+from flask_app.models.estudio import Estudio
 from functools import wraps
 
 def financiera_admin_required(f):
@@ -19,8 +20,9 @@ def financiera_admin_required(f):
 @app.route('/financiera/juicios')
 @financiera_admin_required
 def financiera_juicios():
-    juicios = Juicio.get_all()
-    return render_template('financiera/juicios.html', juicios=juicios)
+    juicios = Juicio.obtener_todos()
+    estudios = Estudio.get_all()
+    return render_template('financiera/juicios.html', juicios=juicios, estudios=estudios)
 
 @app.route('/financiera/juicios/nuevo')
 @financiera_admin_required
@@ -41,7 +43,7 @@ def crear_juicio():
         'estado': 'Pendiente'
     }
     
-    Juicio.save(data)
+    Juicio.crear_juicio(data)
     flash("Juicio creado exitosamente", "success")
     return redirect('/financiera/juicios')
 
@@ -75,4 +77,19 @@ def actualizar_juicio(id):
 def eliminar_juicio(id):
     Juicio.delete(id)
     flash("Juicio eliminado exitosamente", "success")
+    return redirect('/financiera/juicios')
+
+@app.route('/financiera/juicios/asignar/<int:juicio_id>', methods=['POST'])
+@financiera_admin_required
+def asignar_juicio(juicio_id):
+    estudio_id = request.form['estudio']
+    Juicio.asignar_estudio(juicio_id, estudio_id)
+    flash('Juicio asignado exitosamente', 'success')
+    return redirect('/financiera/juicios')
+
+@app.route('/financiera/juicios/terminar/<int:juicio_id>', methods=['POST'])
+@financiera_admin_required
+def terminar_juicio(juicio_id):
+    Juicio.terminar_juicio(juicio_id)
+    flash('Juicio terminado exitosamente', 'success')
     return redirect('/financiera/juicios')

@@ -6,6 +6,26 @@
     <title>Nuevo Usuario</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleEstudioSelect() {
+            const rolSelect = document.getElementById('rol');
+            const estudioSelect = document.getElementById('estudio_select');
+            const estudioInput = document.getElementById('estudio_id');
+            
+            if (rolSelect.value === 'abogado') {
+                estudioSelect.style.display = 'block';
+                estudioInput.required = true;
+            } else {
+                estudioSelect.style.display = 'none';
+                estudioInput.required = false;
+                estudioInput.value = '';
+            }
+        }
+        
+        // Ejecutar al cargar la página por si hay un valor preseleccionado
+        document.addEventListener('DOMContentLoaded', toggleEstudioSelect);
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -55,12 +75,21 @@
                             </div>
                             <div class="mb-3">
                                 <label for="rol" class="form-label">Rol:</label>
-                                <select class="form-select" id="rol" name="rol" required>
+                                <select class="form-select" id="rol" name="rol" required onchange="toggleEstudioSelect()">
                                     <option value="">Seleccione un rol</option>
                                     <option value="financiera">Financiera</option>
                                     <option value="abogado">Abogado</option>
                                     <option value="incautador">Incautador</option>
                                     <option value="admin">Administrador</option>
+                                </select>
+                            </div>
+                            <div class="mb-3" id="estudio_select" style="display: none;">
+                                <label for="estudio_id" class="form-label">Estudio Jurídico:</label>
+                                <select class="form-select" id="estudio_id" name="estudio_id">
+                                    <option value="">Seleccione un estudio</option>
+                                    {% for estudio in estudios %}
+                                    <option value="{{ estudio.id }}">{{ estudio.nombre }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                             <div class="d-grid gap-2">

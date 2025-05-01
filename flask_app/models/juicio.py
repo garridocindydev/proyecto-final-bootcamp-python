@@ -1,17 +1,26 @@
 from flask_app.config.my_sql_conection import MySQLConnection
 from flask import flash
+from flask_app.models.estudio import Estudio
 
 class Juicio:
     def __init__(self, data):
-        self.id = data.get('id')
+        self.id = data['id']
         self.id_pagare = data['id_pagare']
         self.rol = data['rol']
         self.tribunal = data['tribunal']
-        self.estudio = data.get('estudio')
         self.cuantia = data['cuantia']
         self.estado = data.get('estado', 'Pendiente')
         self.created_at = data.get('created_at')
         self.updated_at = data.get('updated_at')
+        # Si tenemos datos del estudio en el diccionario, creamos un objeto Estudio
+        if 'estudio_id' in data and data['estudio_id']:
+            estudio_data = {
+                'id': data['estudio_id'],
+                'nombre': data.get('estudio_nombre', '')
+            }
+            self.estudio = Estudio(estudio_data)
+        else:
+            self.estudio = None
 
     @classmethod
     def crear_juicio(cls, data):
@@ -23,7 +32,12 @@ class Juicio:
 
     @classmethod
     def obtener_todos(cls):
-        query = "SELECT * FROM juicios"
+        query = """
+            SELECT j.*, e.id as estudio_id, e.nombre as estudio_nombre 
+            FROM juicios j
+            LEFT JOIN estudios e ON j.estudio = e.id
+            ORDER BY j.created_at DESC
+        """
         resultados = MySQLConnection('incautaciones_judiciales_db').query_db(query)
         juicios = []
         for juicio in resultados:

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Juicios - Financiera</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Gestión de Juicios</h2>
+            <form action="/logout" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-outline-danger">Cerrar Sesión</button>
+            </form>
+        </div>
+        
+        <!-- Formulario para crear nuevo juicio -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Crear Nuevo Juicio</h4>
+            </div>
+            <div class="card-body">
+                <form action="/financiera/juicios/crear" method="POST">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="id_pagare" class="form-label">ID Pagaré</label>
+                            <input type="text" class="form-control" id="id_pagare" name="id_pagare" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="rol" class="form-label">Rol</label>
+                            <input type="text" class="form-control" id="rol" name="rol" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="tribunal" class="form-label">Tribunal</label>
+                            <input type="text" class="form-control" id="tribunal" name="tribunal" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="cuantia" class="form-label">Cuantía</label>
+                            <input type="number" class="form-control" id="cuantia" name="cuantia" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Crear Juicio</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabla de juicios -->
+        <div class="card">
+            <div class="card-header">
+                <h4>Listado de Juicios</h4>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID Pagaré</th>
+                            <th>Rol</th>
+                            <th>Tribunal</th>
+                            <th>Estudio</th>
+                            <th>Cuantía</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for juicio in juicios %}
+                        <tr>
+                            <td>{{ juicio.id_pagare }}</td>
+                            <td>{{ juicio.rol }}</td>
+                            <td>{{ juicio.tribunal }}</td>
+                            <td>{{ juicio.estudio.nombre if juicio.estudio else 'Sin asignar' }}</td>
+                            <td>${{ juicio.cuantia }}</td>
+                            <td>{{ juicio.estado }}</td>
+                            <td>
+                                {% if not juicio.estudio %}
+                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#asignarModal{{ juicio.id }}">
+                                    Asignar
+                                </button>
+                                {% endif %}
+                                {% if juicio.estado != 'Terminado' %}
+                                <form action="/terminar_juicio/{{ juicio.id }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">Terminar</button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        <!-- Modal para asignar estudio -->
+                        <div class="modal fade" id="asignarModal{{ juicio.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Asignar Estudio Jurídico</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="/financiera/juicios/asignar/{{ juicio.id }}" method="POST">
+                                            <div class="mb-3">
+                                                <label for="estudio" class="form-label">Seleccionar Estudio</label>
+                                                <select class="form-select" name="estudio" required>
+                                                    {% for estudio in estudios %}
+                                                    <option value="{{ estudio.id }}">{{ estudio.nombre }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Asignar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

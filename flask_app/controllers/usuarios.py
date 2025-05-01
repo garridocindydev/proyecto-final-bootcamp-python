@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, session, flash
 from flask_app import app
 from flask_app.models.usuario import Usuario
+from flask_app.models.estudio import Estudio
 from flask_bcrypt import Bcrypt
 from functools import wraps
 
@@ -36,6 +37,8 @@ def login():
     
     if usuario.rol == 'admin':
         return redirect('/admin/usuarios')
+    elif usuario.rol == 'financiera':
+        return redirect('/financiera/juicios')
     return redirect('/dashboard')
 
 @app.route('/dashboard')
@@ -53,7 +56,8 @@ def admin_usuarios():
 @app.route('/admin/usuarios/nuevo')
 @admin_required
 def nuevo_usuario():
-    return render_template('admin/nuevo_usuario.html')
+    estudios = Estudio.get_all()
+    return render_template('admin/nuevo_usuario.html', estudios=estudios)
 
 @app.route('/admin/usuarios/crear', methods=['POST'])
 @admin_required
@@ -70,7 +74,8 @@ def crear_usuario():
         'nombre': request.form['nombre'],
         'email': request.form['email'],
         'password': pw_hash,
-        'rol': request.form['rol']
+        'rol': request.form['rol'],
+        'estudio_id': request.form.get('estudio_id') if request.form['rol'] == 'abogado' else None
     }
     
     Usuario.save(data)
@@ -84,7 +89,8 @@ def eliminar_usuario(id):
     flash("Usuario eliminado exitosamente", "success")
     return redirect('/admin/usuarios')
 
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 def logout():
     session.clear()
+    flash("Has cerrado sesión exitosamente", "success")
     return redirect('/')

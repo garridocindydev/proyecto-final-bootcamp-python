@@ -1,5 +1,6 @@
-from flask_app.config.mysqlconnection import connectToMySQL
+from flask_app.config.my_sql_conection import connectToMySQL
 from flask import flash
+from flask_app.models.estudio import Estudio
 import re
 
 class Usuario:
@@ -12,6 +13,15 @@ class Usuario:
         self.rol = data.get('rol')
         self.created_at = data.get('created_at')
         self.updated_at = data.get('updated_at')
+        # Si tenemos datos del estudio en el diccionario, creamos un objeto Estudio
+        if 'estudio_id' in data and data['estudio_id']:
+            estudio_data = {
+                'id': data['estudio_id'],
+                'nombre': data.get('estudio_nombre', '')
+            }
+            self.estudio = Estudio(estudio_data)
+        else:
+            self.estudio = None
 
     @staticmethod
     def validar_rut(rut):
@@ -101,25 +111,35 @@ class Usuario:
 
     @classmethod
     def get_by_rut(cls, rut):
-        query = "SELECT * FROM usuarios WHERE rut = %(rut)s;"
-        results = connectToMySQL('incautacion_judicial_db').query_db(query, {'rut': rut})
+        query = """
+            SELECT u.*, e.id as estudio_id, e.nombre as estudio_nombre 
+            FROM usuarios u
+            LEFT JOIN estudios e ON u.estudio_id = e.id
+            WHERE u.rut = %(rut)s;
+        """
+        results = connectToMySQL('incautaciones_judiciales_db').query_db(query, {'rut': rut})
         return cls(results[0]) if results else None
 
     @classmethod
     def get_all(cls):
-        query = "SELECT * FROM usuarios ORDER BY nombre;"
-        results = connectToMySQL('incautacion_judicial_db').query_db(query)
+        query = """
+            SELECT u.*, e.id as estudio_id, e.nombre as estudio_nombre 
+            FROM usuarios u
+            LEFT JOIN estudios e ON u.estudio_id = e.id
+            ORDER BY u.nombre;
+        """
+        results = connectToMySQL('incautaciones_judiciales_db').query_db(query)
         return [cls(result) for result in results]
 
     @classmethod
     def save(cls, data):
         query = """
-            INSERT INTO usuarios (rut, nombre, email, password, rol)
-            VALUES (%(rut)s, %(nombre)s, %(email)s, %(password)s, %(rol)s);
+            INSERT INTO usuarios (rut, nombre, email, password, rol, estudio_id)
+            VALUES (%(rut)s, %(nombre)s, %(email)s, %(password)s, %(rol)s, %(estudio_id)s);
         """
-        return connectToMySQL('incautacion_judicial_db').query_db(query, data)
+        return connectToMySQL('incautaciones_judiciales_db').query_db(query, data)
 
     @classmethod
     def delete(cls, usuario_id):
         query = "DELETE FROM usuarios WHERE id = %(id)s;"
-        return connectToMySQL('incautacion_judicial_db').query_db(query, {'id': usuario_id})
+        return connectToMySQL('incautaciones_judiciales_db').query_db(query, {'id': usuario_id})

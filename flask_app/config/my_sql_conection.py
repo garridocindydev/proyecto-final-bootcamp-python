@@ -1,11 +1,20 @@
-import os  # Importamos librería para acceder a variables de entorno
-import pymysql.cursors  # Utilizamos un cursos para interactuar con BD
+import os
+from dotenv import load_dotenv
+import pymysql.cursors  # Utilizamos un cursor para interactuar con BD
+
+# Carga las variables de entorno desde el archivo .env
+load_dotenv()
 
 class MySQLConnection: #Clase que permite generar instancia de conexión con BD
     def __init__(self, db):
-        connection = pymysql.connect(host = 'localhost',
-                                    user = 'root', # Cambia el usuario y contraseña
-                                    password = 'root', 
+        print("Initializing MySQLConnection...")
+        print("os.getenv('HOST')", os.getenv('HOST'))
+        print("os.getenv('USER')", os.getenv('USER'))
+        print("os.getenv('PASSWORD')", os.getenv('PASSWORD'))
+    
+        connection = pymysql.connect(host = os.getenv("HOST"),
+                                    user = os.getenv("USER"), # Cambia el usuario y contraseña
+                                    password = os.getenv("PASSWORD"), 
                                     db = db,
                                     charset = 'utf8mb4',
                                     cursorclass = pymysql.cursors.DictCursor,

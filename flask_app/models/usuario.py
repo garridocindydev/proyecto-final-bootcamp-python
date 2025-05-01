@@ -1,4 +1,4 @@
-from flask_app.config.mysqlconnection import connectToMySQL
+from flask_app.config.my_sql_conection import connectToMySQL
 from flask import flash
 import re
 
@@ -102,13 +102,13 @@ class Usuario:
     @classmethod
     def get_by_rut(cls, rut):
         query = "SELECT * FROM usuarios WHERE rut = %(rut)s;"
-        results = connectToMySQL('incautacion_judicial_db').query_db(query, {'rut': rut})
+        results = connectToMySQL('incautaciones_judiciales_db').query_db(query, {'rut': rut})
         return cls(results[0]) if results else None
 
     @classmethod
     def get_all(cls):
         query = "SELECT * FROM usuarios ORDER BY nombre;"
-        results = connectToMySQL('incautacion_judicial_db').query_db(query)
+        results = connectToMySQL('incautaciones_judiciales_db').query_db(query)
         return [cls(result) for result in results]
 
     @classmethod
@@ -117,9 +117,9 @@ class Usuario:
             INSERT INTO usuarios (rut, nombre, email, password, rol)
             VALUES (%(rut)s, %(nombre)s, %(email)s, %(password)s, %(rol)s);
         """
-        return connectToMySQL('incautacion_judicial_db').query_db(query, data)
+        return connectToMySQL('incautaciones_judiciales_db').query_db(query, data)
 
     @classmethod
     def delete(cls, usuario_id):
         query = "DELETE FROM usuarios WHERE id = %(id)s;"
-        return connectToMySQL('incautacion_judicial_db').query_db(query, {'id': usuario_id})
+        return connectToMySQL('incautaciones_judiciales_db').query_db(query, {'id': usuario_id})

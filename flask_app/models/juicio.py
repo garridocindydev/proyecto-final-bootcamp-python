@@ -19,12 +19,12 @@ class Juicio:
             INSERT INTO juicios (id_pagare, rol, tribunal, cuantia, estado)
             VALUES (%(id_pagare)s, %(rol)s, %(tribunal)s, %(cuantia)s, 'Pendiente')
         """
-        return MySQLConnection('proyecto_final').query_db(query, data)
+        return MySQLConnection('incautaciones_judiciales_db').query_db(query, data)
 
     @classmethod
     def obtener_todos(cls):
         query = "SELECT * FROM juicios"
-        resultados = MySQLConnection('proyecto_final').query_db(query)
+        resultados = MySQLConnection('incautaciones_judiciales_db').query_db(query)
         juicios = []
         for juicio in resultados:
             juicios.append(cls(juicio))
@@ -41,7 +41,7 @@ class Juicio:
             'juicio_id': juicio_id,
             'estudio_id': estudio_id
         }
-        return MySQLConnection('proyecto_final').query_db(query, data)
+        return MySQLConnection('incautaciones_judiciales_db').query_db(query, data)
 
     @classmethod
     def terminar_juicio(cls, juicio_id):
@@ -50,7 +50,7 @@ class Juicio:
             SET estado = 'Terminado'
             WHERE id = %(juicio_id)s
         """
-        return MySQLConnection('nombre_base_datos').query_db(query, {'juicio_id': juicio_id})
+        return MySQLConnection('incautaciones_judiciales_db').query_db(query, {'juicio_id': juicio_id})
 
     @staticmethod
     def validar_juicio(juicio):

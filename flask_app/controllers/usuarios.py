@@ -89,7 +89,7 @@ def eliminar_usuario(id):
     flash("Usuario eliminado exitosamente", "success")
     return redirect('/admin/usuarios')
 
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['POST','GET'])
 def logout():
     session.clear()
     flash("Has cerrado sesión exitosamente", "success")

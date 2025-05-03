@@ -6,7 +6,7 @@ from flask_app.models.mensaje import Mensaje
 
 @app.route('/abogado/dashboard')
 def abogado_dashboard():
-    if 'usuario_id' not in session or session['rol'] != 'abogado':
+    if 'usuario_id' not in session or session.get('rol') not in ['abogado', 'super_abogado']:
         return redirect('/')
     
     # Obtener los juicios asignados al abogado
@@ -15,7 +15,7 @@ def abogado_dashboard():
 
 @app.route('/abogado/juicios')
 def abogado_juicios():
-    if 'usuario_id' not in session or session['rol'] != 'abogado':
+    if 'usuario_id' not in session or session.get('rol') not in ['abogado', 'super_abogado']:
         return redirect('/')
     
     juicios = Juicio.obtener_por_abogado(session['usuario_id'])
@@ -24,7 +24,7 @@ def abogado_juicios():
 
 @app.route('/abogado/juicio/asignar_incautador', methods=['POST'])
 def asignar_incautador():
-    if 'usuario_id' not in session or session['rol'] != 'abogado':
+    if 'usuario_id' not in session or session.get('rol') not in ['abogado', 'super_abogado']:
         return redirect('/')
     
     juicio_id = request.form['juicio_id']
@@ -36,7 +36,7 @@ def asignar_incautador():
 
 @app.route('/abogado/mensajes/<int:juicio_id>')
 def ver_mensajes(juicio_id):
-    if 'usuario_id' not in session or session['rol'] != 'abogado':
+    if 'usuario_id' not in session or session.get('rol') not in ['abogado', 'super_abogado']:
         return redirect('/')
     
     mensajes = Mensaje.obtener_por_juicio(juicio_id)

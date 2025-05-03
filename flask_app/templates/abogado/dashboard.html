@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard de Abogado{% endblock %}
+{% block title %}Dashboard de {{ 'Super Abogado' if session['rol'] == 'super_abogado' else 'Abogado' }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
-            <h1 class="mb-4">Dashboard de Abogado</h1>
+            <h1 class="mb-4">Dashboard de {{ 'Super Abogado' if session['rol'] == 'super_abogado' else 'Abogado' }}</h1>
             
             <div class="card mb-4">
                 <div class="card-body">

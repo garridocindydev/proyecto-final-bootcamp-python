@@ -39,13 +39,13 @@ def login():
         return redirect('/admin')
     elif usuario.rol == 'financiera':
         return redirect('/financiera/juicios')
-    elif usuario.rol == 'abogado':
+    elif usuario.rol in ['abogado', 'super_abogado']:
         return redirect('/abogado/dashboard')
     return redirect('/dashboard')
 
 @app.route('/abogado/dashboard')
 def abogado_dashboard():
-    if 'usuario_id' not in session or session.get('rol') != 'abogado':
+    if 'usuario_id' not in session or session.get('rol') not in ['abogado', 'super_abogado']:
         return redirect('/')
     
     # Obtener el usuario actual

@@ -102,7 +102,7 @@ class Usuario:
             is_valid = False
             
         # Validar rol
-        roles_validos = ['admin', 'financiera', 'abogado', 'incautador']
+        roles_validos = ['admin', 'financiera', 'super_abogado', 'abogado', 'incautador']
         if usuario['rol'] not in roles_validos:
             flash("Rol inválido", "error")
             is_valid = False

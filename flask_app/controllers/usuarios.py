@@ -36,7 +36,7 @@ def login():
     session['rol'] = usuario.rol
     
     if usuario.rol == 'admin':
-        return redirect('/admin/usuarios')
+        return redirect('/admin')
     elif usuario.rol == 'financiera':
         return redirect('/financiera/juicios')
     return redirect('/dashboard')
@@ -46,6 +46,11 @@ def dashboard():
     if 'usuario_id' not in session:
         return redirect('/')
     return render_template('dashboard.html')
+
+@app.route('/admin')
+@admin_required
+def admin_dashboard():
+    return render_template('admin/dashboard.html')
 
 @app.route('/admin/usuarios')
 @admin_required

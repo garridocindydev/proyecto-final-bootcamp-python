@@ -132,6 +132,15 @@ class Usuario:
         return [cls(result) for result in results]
 
     @classmethod
+    def get_by_role(cls, rol):
+        query = "SELECT * FROM usuarios WHERE rol = %(rol)s"
+        resultados = connectToMySQL('incautaciones_judiciales_db').query_db(query, {'rol': rol})
+        usuarios = []
+        for usuario in resultados:
+            usuarios.append(cls(usuario))
+        return usuarios
+
+    @classmethod
     def save(cls, data):
         query = """
             INSERT INTO usuarios (rut, nombre, email, password, rol, estudio_id)

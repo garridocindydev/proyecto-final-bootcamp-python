@@ -38,7 +38,7 @@ class Asignacion:
                 'id': row['juicio_id'],
                 'rol': row['rol'],
                 'tribunal': row['tribunal'],
-                'patente_vehiculo': row['patente_vehiculo'],
+                'patente_vehiculo': row['patente_vehiculo']
             }
             asignacion.abogado = {
                 'nombre': row['abogado_nombre']

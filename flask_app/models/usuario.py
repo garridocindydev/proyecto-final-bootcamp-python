@@ -149,6 +149,17 @@ class Usuario:
         return connectToMySQL('incautaciones_judiciales_db').query_db(query, data)
 
     @classmethod
+    def get_by_id(cls, id):
+        query = """
+            SELECT u.*, e.id as estudio_id, e.nombre as estudio_nombre 
+            FROM usuarios u
+            LEFT JOIN estudios e ON u.estudio_id = e.id
+            WHERE u.id = %(id)s;
+        """
+        results = connectToMySQL('incautaciones_judiciales_db').query_db(query, {'id': id})
+        return cls(results[0]) if results else None
+
+    @classmethod
     def delete(cls, usuario_id):
         query = "DELETE FROM usuarios WHERE id = %(id)s;"
         return connectToMySQL('incautaciones_judiciales_db').query_db(query, {'id': usuario_id})

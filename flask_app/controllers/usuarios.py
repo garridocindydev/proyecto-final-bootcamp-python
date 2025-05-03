@@ -39,7 +39,45 @@ def login():
         return redirect('/admin')
     elif usuario.rol == 'financiera':
         return redirect('/financiera/juicios')
+    elif usuario.rol == 'abogado':
+        return redirect('/abogado/dashboard')
     return redirect('/dashboard')
+
+@app.route('/abogado/dashboard')
+def abogado_dashboard():
+    if 'usuario_id' not in session or session.get('rol') != 'abogado':
+        return redirect('/')
+    
+    # Obtener el usuario actual
+    usuario = Usuario.get_by_id(session['usuario_id'])
+    
+    # Obtener los juicios del estudio del abogado
+    from flask_app.models.juicio import Juicio
+    juicios = Juicio.obtener_por_estudio(usuario.estudio_id)
+    
+    # Calcular estadísticas
+    total_juicios = len(juicios)
+    juicios_pendientes = len([j for j in juicios if j.estado == 'Pendiente'])
+    juicios_asignados = len([j for j in juicios if j.estado == 'Asignado'])
+    
+    return render_template('abogado/dashboard.html',
+                           total_juicios=total_juicios,
+                           juicios_pendientes=juicios_pendientes,
+                           juicios_asignados=juicios_asignados)
+
+@app.route('/abogado/juicios')
+def abogado_juicios():
+    if 'usuario_id' not in session or session.get('rol') != 'abogado':
+        return redirect('/')
+    
+    # Obtener el usuario actual
+    usuario = Usuario.get_by_id(session['usuario_id'])
+    
+    # Obtener los juicios del estudio del abogado
+    from flask_app.models.juicio import Juicio
+    juicios = Juicio.obtener_por_estudio(usuario.estudio_id)
+    
+    return render_template('abogado/juicios.html', juicios=juicios)
 
 @app.route('/dashboard')
 def dashboard():
@@ -94,7 +132,7 @@ def eliminar_usuario(id):
     flash("Usuario eliminado exitosamente", "success")
     return redirect('/admin/usuarios')
 
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['POST','GET'])
 def logout():
     session.clear()
     flash("Has cerrado sesión exitosamente", "success")

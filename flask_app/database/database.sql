@@ -40,12 +40,3 @@ CREATE TABLE IF NOT EXISTS usuarios (
     CONSTRAINT chk_abogado_estudio CHECK (rol != 'abogado' OR (rol = 'abogado' AND estudio_id IS NOT NULL))
 );
 
--- Crear el usuario administrador inicial
-INSERT INTO usuarios (rut, nombre, email, password, rol)
-VALUES (
-    'admin',
-    'Administrador',
-    'admin@sistema.com',
-    '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewFuWQSDUYfGw1Vy', -- Contraseña: admin123
-    'admin'
-);

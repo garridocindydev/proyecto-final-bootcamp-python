@@ -53,7 +53,7 @@ def abogado_dashboard():
     
     # Obtener los juicios del estudio del abogado
     from flask_app.models.juicio import Juicio
-    juicios = Juicio.obtener_por_estudio(usuario.estudio_id)
+    juicios = Juicio.obtener_por_estudio(usuario.estudio.id)
     
     # Calcular estadísticas
     total_juicios = len(juicios)
@@ -67,7 +67,7 @@ def abogado_dashboard():
 
 @app.route('/abogado/juicios')
 def abogado_juicios():
-    if 'usuario_id' not in session or session.get('rol') != 'abogado':
+    if 'usuario_id' not in session or session.get('rol') not in ['abogado', 'super_abogado']:
         return redirect('/')
     
     # Obtener el usuario actual
@@ -75,9 +75,29 @@ def abogado_juicios():
     
     # Obtener los juicios del estudio del abogado
     from flask_app.models.juicio import Juicio
-    juicios = Juicio.obtener_por_estudio(usuario.estudio_id)
+    juicios = Juicio.obtener_por_estudio(usuario.estudio.id)
     
-    return render_template('abogado/juicios.html', juicios=juicios)
+    # Si es super_abogado, obtener la lista de abogados disponibles
+    abogados = []
+    if session.get('rol') == 'super_abogado':
+        abogados = Usuario.obtener_por_rol_y_estudio('abogado', usuario.estudio.id)
+    
+    return render_template('abogado/juicios.html', juicios=juicios, abogados=abogados)
+
+@app.route('/abogado/juicios/<int:juicio_id>')
+def ver_juicio(juicio_id):
+    if 'usuario_id' not in session or session.get('rol') not in ['abogado', 'super_abogado']:
+        return redirect('/')
+    
+    # Obtener el juicio
+    from flask_app.models.juicio import Juicio
+    juicio = Juicio.obtener_por_id(juicio_id)
+    
+    if not juicio:
+        flash('Juicio no encontrado', 'error')
+        return redirect('/abogado/juicios')
+    
+    return render_template('abogado/ver_juicio.html', juicio=juicio)
 
 @app.route('/dashboard')
 def dashboard():
@@ -118,7 +138,7 @@ def crear_usuario():
         'email': request.form['email'],
         'password': pw_hash,
         'rol': request.form['rol'],
-        'estudio_id': request.form.get('estudio_id') if request.form['rol'] == 'abogado' else None
+        'estudio_id': request.form.get('estudio_id') if request.form['rol'] in ['abogado', 'super_abogado'] else None
     }
     
     Usuario.save(data)

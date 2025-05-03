@@ -45,12 +45,13 @@
 
                         <div class="mb-3">
                             <label for="rol" class="form-label">Rol</label>
-                            <select class="form-select" id="rol" name="rol" required onchange="toggleEstudioSelect()">
-                                <option value="">Seleccione un rol</option>
+                            <select name="rol" id="rol" class="form-select" required onchange="toggleEstudioSelect()">
+                                <option value="">Seleccionar rol</option>
                                 <option value="admin">Administrador</option>
-                                <option value="financiera">Financiera</option>
                                 <option value="abogado">Abogado</option>
+                                <option value="super_abogado">Super Abogado</option>
                                 <option value="incautador">Incautador</option>
+                                <option value="financiera">Financiera</option>
                             </select>
                         </div>
 
@@ -77,15 +78,15 @@
 
 <script>
     function toggleEstudioSelect() {
-        const rolSelect = document.getElementById('rol');
-        const estudioSelect = document.getElementById('estudio-select');
-        const estudioInput = document.getElementById('estudio_id');
+        var rolSelect = document.getElementById('rol');
+        var estudioDiv = document.getElementById('estudio-select');
+        var estudioInput = document.getElementById('estudio_id');
         
-        if (rolSelect.value === 'abogado') {
-            estudioSelect.style.display = 'block';
+        if (rolSelect.value === 'abogado' || rolSelect.value === 'super_abogado') {
+            estudioDiv.style.display = 'block';
             estudioInput.required = true;
         } else {
-            estudioSelect.style.display = 'none';
+            estudioDiv.style.display = 'none';
             estudioInput.required = false;
             estudioInput.value = '';
         }

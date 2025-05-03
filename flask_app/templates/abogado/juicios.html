@@ -48,9 +48,47 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="{{ url_for('ver_juicio', id=juicio.id) }}" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-eye"></i> Ver Detalles
-                                        </a>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('ver_juicio', juicio_id=juicio.id) }}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-eye"></i> Ver Detalles
+                                            </a>
+                                            {% if session.rol == 'super_abogado' and not juicio.abogado %}
+                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#asignarModal{{ juicio.id }}">
+                                                <i class="fas fa-user-plus"></i> Asignar Abogado
+                                            </button>
+                                            {% endif %}
+                                        </div>
+
+                                        {% if session.rol == 'super_abogado' and not juicio.abogado %}
+                                        <!-- Modal para asignar abogado -->
+                                        <div class="modal fade" id="asignarModal{{ juicio.id }}" tabindex="-1" aria-labelledby="asignarModalLabel{{ juicio.id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="asignarModalLabel{{ juicio.id }}">Asignar Abogado al Juicio #{{ juicio.id }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form action="{{ url_for('asignar_abogado_juicio', juicio_id=juicio.id) }}" method="POST">
+                                                        <div class="modal-body">
+                                                            <div class="mb-3">
+                                                                <label for="abogado{{ juicio.id }}" class="form-label">Seleccionar Abogado</label>
+                                                                <select class="form-select" id="abogado{{ juicio.id }}" name="abogado_id" required>
+                                                                    <option value="">Seleccione un abogado...</option>
+                                                                    {% for abogado in abogados %}
+                                                                    <option value="{{ abogado.id }}">{{ abogado.nombre }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                            <button type="submit" class="btn btn-success">Asignar</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}

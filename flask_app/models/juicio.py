@@ -173,26 +173,6 @@ class Juicio:
             'abogado_id': abogado_id
         })
 
-    @classmethod
-    def obtener_por_estudio(cls, estudio_id):
-        query = """
-            SELECT j.*, 
-                e.id as estudio_id, e.nombre as estudio_nombre,
-                a.id as abogado_id, a.nombre as abogado_nombre, a.email as abogado_email,
-                i.id as incautador_id, i.nombre as incautador_nombre, i.email as incautador_email
-            FROM juicios j
-            LEFT JOIN estudios e ON j.estudio = e.id
-            LEFT JOIN usuarios a ON j.abogado_id = a.id
-            LEFT JOIN usuarios i ON j.incautador_id = i.id
-            WHERE j.estudio = %(estudio_id)s
-            ORDER BY j.created_at DESC
-        """
-        resultados = MySQLConnection('incautaciones_judiciales_db').query_db(query, {'estudio_id': estudio_id})
-        juicios = []
-        for juicio in resultados:
-            juicios.append(cls(juicio))
-        return juicios
-
     @staticmethod
     def validar_juicio(juicio):
         is_valid = True

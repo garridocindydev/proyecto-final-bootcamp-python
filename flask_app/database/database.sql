@@ -17,11 +17,13 @@ CREATE TABLE IF NOT EXISTS juicios (
     rol VARCHAR(255) NOT NULL,
     tribunal VARCHAR(255) NOT NULL,
     estudio INT,
+    abogado_id INT,
     cuantia DECIMAL(10,2) NOT NULL,
     estado ENUM('Pendiente', 'Asignado', 'Terminado') DEFAULT 'Pendiente',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (estudio) REFERENCES estudios(id)
+    FOREIGN KEY (estudio) REFERENCES estudios(id),
+    FOREIGN KEY (abogado_id) REFERENCES usuarios(id)
 );
 
 -- Tabla de usuarios

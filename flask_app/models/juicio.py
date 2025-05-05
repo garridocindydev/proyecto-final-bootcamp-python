@@ -173,6 +173,19 @@ class Juicio:
             'abogado_id': abogado_id
         })
 
+    @classmethod
+    def asignar_abogado_juicio(cls, juicio_id, abogado_id):
+        query = """
+            UPDATE juicios 
+            SET abogado_id = %(abogado_id)s, estado = 'Asignado'
+            WHERE id = %(juicio_id)s
+        """
+        data = {
+            'juicio_id': juicio_id,
+            'abogado_id': abogado_id
+        }
+        return MySQLConnection('incautaciones_judiciales_db').query_db(query, data)
+
     @staticmethod
     def validar_juicio(juicio):
         is_valid = True

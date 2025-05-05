@@ -40,10 +40,10 @@ def login():
     elif usuario.rol == 'financiera':
         return redirect('/financiera/juicios')
     elif usuario.rol in ['abogado', 'super_abogado']:
-        return redirect('/abogado/dashboard')
+        return redirect('/abogado')
     return redirect('/dashboard')
 
-@app.route('/abogado/dashboard')
+@app.route('/abogado')
 def abogado_dashboard():
     if 'usuario_id' not in session or session.get('rol') not in ['abogado', 'super_abogado']:
         return redirect('/')
@@ -65,8 +65,8 @@ def abogado_dashboard():
                            juicios_pendientes=juicios_pendientes,
                            juicios_asignados=juicios_asignados)
 
-@app.route('/abogado/juicios')
-def abogado_juicios():
+@app.route('/usuarios/abogado/juicios')
+def usuario_abogado_juicios():
     if 'usuario_id' not in session or session.get('rol') not in ['abogado', 'super_abogado']:
         return redirect('/')
     

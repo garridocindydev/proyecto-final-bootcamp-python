@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS juicios (
     rol VARCHAR(255) NOT NULL,
     tribunal VARCHAR(255) NOT NULL,
     estudio INT,
-    cuantia DECIMAL(10,2) NOT NULL,
-    estado ENUM('Pendiente', 'Asignado', 'Terminado') DEFAULT 'Pendiente',
+    patente_vehiculo VARCHAR(10) NOT NULL,
+    estado ENUM('Pendiente', 'Asignado', 'Ejecutado', 'Fallido') DEFAULT 'Pendiente',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (estudio) REFERENCES estudios(id)
@@ -36,9 +36,41 @@ CREATE TABLE IF NOT EXISTS usuarios (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (estudio_id) REFERENCES estudios(id),
-    -- Aseguramos que solo los abogados tengan estudio asignado
     CONSTRAINT chk_abogado_estudio CHECK (rol != 'abogado' OR (rol = 'abogado' AND estudio_id IS NOT NULL))
 );
+
+-- Tabla de asignaciones de juicios a incautadores
+CREATE TABLE IF NOT EXISTS asignaciones_juicios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    juicio_id INT NOT NULL,
+    abogado_id INT NOT NULL,
+    incautador_id INT NOT NULL,
+    fecha_asignacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_ejecucion DATETIME,
+    estado ENUM('Pendiente', 'En_Proceso', 'Ejecutado', 'Fallido') DEFAULT 'Pendiente',
+    observaciones TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (juicio_id) REFERENCES juicios(id),
+    FOREIGN KEY (abogado_id) REFERENCES usuarios(id),
+    FOREIGN KEY (incautador_id) REFERENCES usuarios(id)
+);
+
+-- Tabla de comentarios de incautadores
+CREATE TABLE IF NOT EXISTS comentarios_incautador (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    asignacion_id INT NOT NULL,
+    incautador_id INT NOT NULL,
+    comentario TEXT NOT NULL,
+    tipo_comentario ENUM('Avance', 'Problema', 'Éxito', 'Otro') NOT NULL,
+    fecha_comentario DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (asignacion_id) REFERENCES asignaciones_juicios(id),
+    FOREIGN KEY (incautador_id) REFERENCES usuarios(id)
+);
+
+-- Insertar datos de prueba
 
 -- Crear el usuario administrador inicial
 INSERT INTO usuarios (rut, nombre, email, password, rol)
@@ -49,3 +81,29 @@ VALUES (
     '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewFuWQSDUYfGw1Vy', -- Contraseña: admin123
     'admin'
 );
+
+-- Insertar un estudio jurídico de prueba
+INSERT INTO estudios (nombre) VALUES ('Estudio Jurídico ABC');
+
+-- Insertar usuarios de prueba
+INSERT INTO usuarios (rut, nombre, email, password, rol, estudio_id) VALUES
+('12345678-9', 'Juan Abogado', 'abogado@test.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewFuWQSDUYfGw1Vy', 'abogado', 1),
+('98765432-1', 'Pedro Incautador', 'incautador@test.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewFuWQSDUYfGw1Vy', 'incautador', NULL);
+
+-- Insertar juicios de prueba
+INSERT INTO juicios (id_pagare, rol, tribunal, estudio, patente_vehiculo, marca_vehiculo, modelo_vehiculo) VALUES
+('PAG001', 'C-1234-2023', '1° Juzgado Civil', 1, 'ABCD12', 'Toyota', 'Corolla'),
+('PAG002', 'C-5678-2023', '2° Juzgado Civil', 1, 'WXYZ98', 'Nissan', 'Versa'),
+('PAG003', 'C-9012-2023', '3° Juzgado Civil', 1, 'EFGH34', 'Hyundai', 'Accent');
+
+-- Insertar asignaciones de prueba
+INSERT INTO asignaciones_juicios (juicio_id, abogado_id, incautador_id, estado) VALUES
+(1, 2, 3, 'Pendiente'),
+(2, 2, 3, 'En_Proceso'),
+(3, 2, 3, 'Pendiente');
+
+-- Insertar algunos comentarios de prueba
+INSERT INTO comentarios_incautador (asignacion_id, incautador_id, comentario, tipo_comentario) VALUES
+(1, 3, 'Iniciando búsqueda del vehículo', 'Avance'),
+(2, 3, 'Vehículo localizado en estacionamiento', 'Éxito'),
+(2, 3, 'Esperando grúa para el retiro', 'Avance');

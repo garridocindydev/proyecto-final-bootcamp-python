@@ -125,13 +125,13 @@ def nuevo_usuario():
 @app.route('/admin/usuarios/crear', methods=['POST'])
 @admin_required
 def crear_usuario():
-    if not Usuario.validar_usuario(request.form):
+    if not Usuario.validar_registro(request.form):
         return redirect('/admin/usuarios/nuevo')
     
-    # Crear el hash del password
+    # Crear el hash de la contraseña
     pw_hash = bcrypt.generate_password_hash(request.form['password'])
     
-    # Crear el diccionario de datos
+    # Preparar los datos para crear el usuario
     data = {
         'rut': request.form['rut'],
         'nombre': request.form['nombre'],
@@ -142,18 +142,17 @@ def crear_usuario():
     }
     
     Usuario.save(data)
-    flash("Usuario creado exitosamente", "success")
+    flash('Usuario creado exitosamente', 'success')
     return redirect('/admin/usuarios')
 
 @app.route('/admin/usuarios/eliminar/<int:id>')
 @admin_required
 def eliminar_usuario(id):
     Usuario.delete(id)
-    flash("Usuario eliminado exitosamente", "success")
+    flash('Usuario eliminado exitosamente', 'success')
     return redirect('/admin/usuarios')
 
 @app.route('/logout', methods=['POST','GET'])
 def logout():
     session.clear()
-    flash("Has cerrado sesión exitosamente", "success")
     return redirect('/')

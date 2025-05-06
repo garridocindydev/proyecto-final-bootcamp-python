@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS juicios (
     tribunal VARCHAR(255) NOT NULL,
     estudio INT,
     patente_vehiculo VARCHAR(10) NOT NULL,
+    abogado_id INT,
     estado ENUM('Pendiente', 'Asignado', 'Ejecutado', 'Fallido') DEFAULT 'Pendiente',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

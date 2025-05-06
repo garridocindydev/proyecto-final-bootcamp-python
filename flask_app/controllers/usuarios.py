@@ -2,6 +2,7 @@ from flask import render_template, request, redirect, session, flash
 from flask_app import app
 from flask_app.models.usuario import Usuario
 from flask_app.models.estudio import Estudio
+from flask_app.models.juicio import Juicio
 from flask_bcrypt import Bcrypt
 from functools import wraps
 
@@ -52,8 +53,10 @@ def abogado_dashboard():
     usuario = Usuario.get_by_id(session['usuario_id'])
     
     # Obtener los juicios del estudio del abogado
-    from flask_app.models.juicio import Juicio
-    juicios = Juicio.obtener_por_estudio(usuario.estudio.id)
+    if session.get('rol') == 'abogado':
+        juicios = Juicio.obtener_por_abogado(usuario.id)
+    else:
+        juicios = Juicio.obtener_por_estudio(usuario.estudio.id)
     
     # Calcular estadísticas
     total_juicios = len(juicios)
@@ -138,7 +141,7 @@ def crear_usuario():
         'email': request.form['email'],
         'password': pw_hash,
         'rol': request.form['rol'],
-        'estudio_id': request.form.get('estudio_id') if request.form['rol'] in ['abogado', 'super_abogado'] else None
+        'estudio_id': request.form.get('estudio_id') if request.form['rol'] == 'abogado' else None
     }
     
     Usuario.save(data)
@@ -152,7 +155,7 @@ def eliminar_usuario(id):
     flash('Usuario eliminado exitosamente', 'success')
     return redirect('/admin/usuarios')
 
-@app.route('/logout', methods=['POST','GET'])
+@app.route('/logout', methods=['POST'])
 def logout():
     session.clear()
     return redirect('/')

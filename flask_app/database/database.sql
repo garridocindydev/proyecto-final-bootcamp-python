@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS asignaciones_juicios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     juicio_id INT NOT NULL,
     abogado_id INT NOT NULL,
+    patente_vehiculo VARCHAR(45) NOT NULL,
     incautador_id INT NOT NULL,
     fecha_asignacion DATETIME DEFAULT CURRENT_TIMESTAMP,
     fecha_ejecucion DATETIME,

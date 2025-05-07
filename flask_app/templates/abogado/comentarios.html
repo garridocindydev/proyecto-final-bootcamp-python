@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Comentarios de Incautadores</h2>
+    
+    {% for asignacion in asignaciones %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Juicio: {{ asignacion.juicio.rol }}</h5>
+            <div class="text-muted">
+                Tribunal: {{ asignacion.juicio.tribunal }} | 
+                Incautador: {{ asignacion.incautador.nombre }}
+            </div>
+        </div>
+        <div class="card-body">
+            {% if asignacion.comentarios %}
+                {% for comentario in asignacion.comentarios %}
+                <div class="comment-box mb-3 p-3 border rounded {% if comentario.tipo_comentario == 'Problema' %}bg-danger-light{% elif comentario.tipo_comentario == 'Éxito' %}bg-success-light{% elif comentario.tipo_comentario == 'Avance' %}bg-info-light{% else %}bg-light{% endif %}">
+                    <div class="d-flex justify-content-between">
+                        <strong class="text-primary">{{ comentario.tipo_comentario }}</strong>
+                        <small class="text-muted">{{ comentario.fecha_comentario.strftime('%d/%m/%Y %H:%M') }}</small>
+                    </div>
+                    <p class="mt-2 mb-0">{{ comentario.comentario }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No hay comentarios para esta asignación.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        No hay asignaciones con comentarios.
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.bg-danger-light { background-color: rgba(220, 53, 69, 0.1); }
+.bg-success-light { background-color: rgba(40, 167, 69, 0.1); }
+.bg-info-light { background-color: rgba(23, 162, 184, 0.1); }
+.comment-box {
+    transition: all 0.3s ease;
+}
+.comment-box:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

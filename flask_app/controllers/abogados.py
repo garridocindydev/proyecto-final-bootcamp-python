@@ -51,6 +51,17 @@ def asignar_abogado_al_juicio(juicio_id):
     flash('Abogado asignado exitosamente al juicio', 'success')
     return redirect('/abogado/juicios')
 
+@app.route('/abogado/comentarios')
+def ver_comentarios_incautador():
+    if 'usuario_id' not in session or session.get('rol') not in ['abogado', 'super_abogado']:
+        return redirect('/')
+    
+    # Obtener las asignaciones y sus comentarios para el abogado
+    from flask_app.models.asignacion import Asignacion
+    asignaciones = Asignacion.get_asignaciones_con_comentarios(session['usuario_id'])
+    return render_template('abogado/comentarios.html', asignaciones=asignaciones)
+    return redirect('/abogado/juicios')
+
 @app.route('/abogado/mensajes/<int:juicio_id>')
 def ver_mensajes(juicio_id):
     if 'usuario_id' not in session or session.get('rol') not in ['abogado', 'super_abogado']:

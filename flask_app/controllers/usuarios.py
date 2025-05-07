@@ -42,7 +42,10 @@ def login():
         return redirect('/financiera/juicios')
     elif usuario.rol in ['abogado', 'super_abogado']:
         return redirect('/abogado')
+    elif usuario.rol == 'incautador':
+        return redirect('/incautador/asignaciones')
     return redirect('/dashboard')
+
 
 @app.route('/abogado')
 def abogado_dashboard():
@@ -77,7 +80,7 @@ def usuario_abogado_juicios():
     usuario = Usuario.get_by_id(session['usuario_id'])
     
     # Obtener los juicios del estudio del abogado
-    from flask_app.models.juicio import Juicio
+  
     juicios = Juicio.obtener_por_estudio(usuario.estudio.id)
     
     # Si es super_abogado, obtener la lista de abogados disponibles
@@ -155,7 +158,7 @@ def eliminar_usuario(id):
     flash('Usuario eliminado exitosamente', 'success')
     return redirect('/admin/usuarios')
 
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['POST', 'GET'])
 def logout():
     session.clear()
     return redirect('/')

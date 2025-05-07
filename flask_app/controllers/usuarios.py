@@ -128,7 +128,7 @@ def nuevo_usuario():
 @app.route('/admin/usuarios/crear', methods=['POST'])
 @admin_required
 def crear_usuario():
-    if not Usuario.validar_registro(request.form):
+    if not Usuario.validar_usuario(request.form):
         return redirect('/admin/usuarios/nuevo')
     
     # Crear el hash de la contraseña

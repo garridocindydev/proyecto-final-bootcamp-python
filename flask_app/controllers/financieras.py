@@ -33,16 +33,17 @@ def nuevo_juicio():
 @financiera_admin_required
 def crear_juicio():
     if not Juicio.validar_juicio(request.form):
+        print("No es valido")
         return redirect('/financiera/juicios/nuevo')
     
     data = {
         'id_pagare': request.form['id_pagare'],
         'rol': request.form['rol'],
         'tribunal': request.form['tribunal'],
-        'cuantia': request.form['cuantia'],
+        'cuantia': float(request.form['cuantia']),
         'estado': 'Pendiente'
     }
-    
+    print
     Juicio.crear_juicio(data)
     flash("Juicio creado exitosamente", "success")
     return redirect('/financiera/juicios')

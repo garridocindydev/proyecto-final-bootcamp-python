@@ -23,7 +23,7 @@ class Asignacion:
     def get_asignaciones_incautador(cls, incautador_id):
         query = """
             SELECT a.*, j.*, u.nombre as abogado_nombre,
-                   j.id as juicio_id, j.rol, j.tribunal, j.patente_vehiculo
+                   j.id as juicio_id, j.rol, j.tribunal
             FROM asignaciones_juicios a
             JOIN juicios j ON a.juicio_id = j.id
             JOIN usuarios u ON a.abogado_id = u.id

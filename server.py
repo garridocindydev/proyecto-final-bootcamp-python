@@ -1,6 +1,8 @@
 from flask_app import app #Importamos la app de la carpeta flask_app
 from flask_app.controllers import usuarios
 from flask_app.controllers import financieras
+from flask_app.controllers import estudios
+from flask_app.controllers import abogados
 from flask_app.controllers import asignaciones
 
 if __name__=="__main__": #Ejecutamos la aplicación

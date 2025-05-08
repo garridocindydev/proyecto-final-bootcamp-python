@@ -8,9 +8,34 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <style>
+      .custom-header {
+        border-bottom: 4px solid #00bfff; /* Borde inferior celeste */
+        background-color: #e6f7ff;
+        color: #007acc;
+        font-size: 32px;
+        font-weight: bold;
+        text-align: center;
+        padding: 20px 0;
+        width: 100%;
+      }
+
+      .custom-header i {
+        margin-left: 10px;
+      }
+    </style>
   </head>
   <body class="bg-light">
-    <div class="container mt-5">
+    <!-- TÍTULO ENCABEZADO -->
+    <div class="custom-header">
+      Gestión Incautaciones <i class="bi bi-gear-fill"></i>
+    </div>
+
+    <div class="container mt-3">
       <div class="row justify-content-center">
         <div class="col-md-6">
           <div class="card shadow">
@@ -20,7 +45,7 @@
               %} {% if messages %} {% for message in messages %}
               <div class="alert alert-danger">{{ message }}</div>
               {% endfor %} {% endif %} {% endwith %}
-              <form action="/login" method="post">
+              <form action="/login" method="post" id="loginForm">
                 <div class="mb-3">
                   <label for="rut" class="form-label">RUT:</label>
                   <input
@@ -47,10 +72,69 @@
                   </button>
                 </div>
               </form>
+
+              <!-- Accesos Rápidos -->
+              <div class="mt-4">
+                <h5 class="text-center mb-3">Accesos Rápidos</h5>
+                <div class="d-grid gap-2">
+                  <button
+                    type="button"
+                    onclick="loginAs('admin')"
+                    class="btn btn-outline-dark"
+                  >
+                    Entrar como Administrador
+                  </button>
+                  <button
+                    type="button"
+                    onclick="loginAs('financiera')"
+                    class="btn btn-outline-success"
+                  >
+                    Entrar como Financiera
+                  </button>
+                  <button
+                    type="button"
+                    onclick="loginAs('super_abogado')"
+                    class="btn btn-outline-info"
+                  >
+                    Entrar como Super Abogado
+                  </button>
+                  <button
+                    type="button"
+                    onclick="loginAs('abogado')"
+                    class="btn btn-outline-info"
+                  >
+                    Entrar como Abogado
+                  </button>
+                  <button
+                    type="button"
+                    onclick="loginAs('incautador')"
+                    class="btn btn-outline-warning"
+                  >
+                    Entrar como Incautador
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <script>
+      const credentials = {
+        admin: { rut: "admin", password: "JUAN1234" },
+        financiera: { rut: "12345678-5", password: "JUAN1234" },
+        super_abogado: { rut: "20319108-1", password: "JUAN1234" },
+        abogado: { rut: "13677708-4", password: "JUAN1234" },
+        incautador: { rut: "8235617-7", password: "JUAN1234" },
+      };
+
+      function loginAs(role) {
+        const cred = credentials[role];
+        document.getElementById("rut").value = cred.rut;
+        document.getElementById("password").value = cred.password;
+        document.getElementById("loginForm").submit();
+      }
+    </script>
   </body>
 </html>

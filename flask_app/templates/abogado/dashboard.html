@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard de {{ 'Super Abogado' if session['rol'] == 'super_abogado' else 'Abogado' }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Dashboard de {{ 'Super Abogado' if session['rol'] == 'super_abogado' else 'Abogado' }}</h1>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Resumen de Juicios</h2>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-primary text-white mb-3">
+                                <div class="card-body">
+                                    <h3 class="card-title">Total de Juicios</h3>
+                                    <p class="display-4">{{ total_juicios }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-warning text-dark mb-3">
+                                <div class="card-body">
+                                    <h3 class="card-title">Juicios Pendientes</h3>
+                                    <p class="display-4">{{ juicios_pendientes }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white mb-3">
+                                <div class="card-body">
+                                    <h3 class="card-title">Juicios Asignados</h3>
+                                    <p class="display-4">{{ juicios_asignados }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <a href="{{ url_for('abogado_juicios') }}" class="btn btn-primary me-2">
+                    <i class="fas fa-gavel"></i> Ver Juicios
+                </a>
+                <a href="{{ url_for('ver_comentarios_incautador') }}" class="btn btn-info">
+                    <i class="fas fa-comments"></i> Ver Comentarios de Incautadores
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

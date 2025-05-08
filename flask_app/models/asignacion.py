@@ -23,7 +23,7 @@ class Asignacion:
     def get_asignaciones_incautador(cls, incautador_id):
         query = """
             SELECT a.*, j.*, u.nombre as abogado_nombre,
-                   j.id as juicio_id, j.rol, j.tribunal, j.patente_vehiculo
+                   j.id as juicio_id, j.rol, j.tribunal
             FROM asignaciones_juicios a
             JOIN juicios j ON a.juicio_id = j.id
             JOIN usuarios u ON a.abogado_id = u.id
@@ -46,6 +46,46 @@ class Asignacion:
             asignacion.comentarios = Comentario.get_by_asignacion(asignacion.id)
             asignaciones.append(asignacion)
         return asignaciones
+
+    @classmethod
+    def get_asignaciones_con_comentarios(cls, abogado_id):
+        query = """
+            SELECT a.*, j.*, u.nombre as incautador_nombre, c.*,
+                   j.id as juicio_id, j.rol, j.tribunal
+            FROM asignaciones_juicios a
+            JOIN juicios j ON a.juicio_id = j.id
+            JOIN usuarios u ON a.incautador_id = u.id
+            LEFT JOIN comentarios_incautador c ON a.id = c.asignacion_id
+            WHERE a.abogado_id = %(abogado_id)s
+            ORDER BY c.fecha_comentario DESC
+        """
+        results = connectToMySQL('incautaciones_judiciales_db').query_db(query, {'abogado_id': abogado_id})
+        asignaciones = {}
+        
+        for row in results:
+            if row['id'] not in asignaciones:
+                asignacion = cls(row)
+                asignacion.juicio = {
+                    'id': row['juicio_id'],
+                    'rol': row['rol'],
+                    'tribunal': row['tribunal']
+                }
+                asignacion.incautador = {
+                    'nombre': row['incautador_nombre']
+                }
+                asignacion.comentarios = []
+                asignaciones[row['id']] = asignacion
+            
+            if row['comentario'] is not None:
+                comentario = {
+                    'id': row['id'],
+                    'comentario': row['comentario'],
+                    'tipo_comentario': row['tipo_comentario'],
+                    'fecha_comentario': row['fecha_comentario']
+                }
+                asignaciones[row['id']].comentarios.append(comentario)
+        
+        return list(asignaciones.values())
 
     @classmethod
     def actualizar_estado(cls, asignacion_id, nuevo_estado, observaciones=None):

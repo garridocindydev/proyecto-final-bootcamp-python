@@ -16,12 +16,16 @@ CREATE TABLE IF NOT EXISTS juicios (
     id_pagare VARCHAR(255) NOT NULL,
     rol VARCHAR(255) NOT NULL,
     tribunal VARCHAR(255) NOT NULL,
+    cuantia FLOAT NOT NULL,
     estudio INT,
-    patente_vehiculo VARCHAR(10) NOT NULL,
+    abogado_id INT,
+    incautador_id INT,
     estado ENUM('Pendiente', 'Asignado', 'Ejecutado', 'Fallido') DEFAULT 'Pendiente',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (estudio) REFERENCES estudios(id)
+    FOREIGN KEY (estudio) REFERENCES estudios(id),
+    FOREIGN KEY (abogado_id) REFERENCES usuarios(id),
+    FOREIGN KEY (incautador_id) REFERENCES usuarios(id)
 );
 
 -- Tabla de usuarios
@@ -31,7 +35,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     nombre VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    rol ENUM('admin', 'financiera', 'abogado', 'incautador') NOT NULL,
+    rol ENUM('admin', 'financiera', 'super_abogado', 'abogado', 'incautador') NOT NULL,
     estudio_id INT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -44,6 +48,7 @@ CREATE TABLE IF NOT EXISTS asignaciones_juicios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     juicio_id INT NOT NULL,
     abogado_id INT NOT NULL,
+    patente_vehiculo VARCHAR(45) NOT NULL,
     incautador_id INT NOT NULL,
     fecha_asignacion DATETIME DEFAULT CURRENT_TIMESTAMP,
     fecha_ejecucion DATETIME,
@@ -107,3 +112,10 @@ INSERT INTO comentarios_incautador (asignacion_id, incautador_id, comentario, ti
 (1, 3, 'Iniciando búsqueda del vehículo', 'Avance'),
 (2, 3, 'Vehículo localizado en estacionamiento', 'Éxito'),
 (2, 3, 'Esperando grúa para el retiro', 'Avance');
+    -- Aseguramos que los abogados y super_abogados tengan estudio asignado
+    CONSTRAINT chk_abogado_estudio CHECK (
+        (rol NOT IN ('abogado', 'super_abogado')) OR 
+        ((rol IN ('abogado', 'super_abogado')) AND estudio_id IS NOT NULL)
+    )
+);
+

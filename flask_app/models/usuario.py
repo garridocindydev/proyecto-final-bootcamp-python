@@ -102,7 +102,7 @@ class Usuario:
             is_valid = False
             
         # Validar rol
-        roles_validos = ['admin', 'financiera', 'abogado', 'incautador']
+        roles_validos = ['admin', 'financiera', 'super_abogado', 'abogado', 'incautador']
         if usuario['rol'] not in roles_validos:
             flash("Rol inválido", "error")
             is_valid = False
@@ -132,12 +132,49 @@ class Usuario:
         return [cls(result) for result in results]
 
     @classmethod
+    def get_by_role(cls, rol):
+        query = "SELECT * FROM usuarios WHERE rol = %(rol)s"
+        resultados = connectToMySQL('incautaciones_judiciales_db').query_db(query, {'rol': rol})
+        usuarios = []
+        for usuario in resultados:
+            usuarios.append(cls(usuario))
+        return usuarios
+
+    @classmethod
+    def obtener_por_rol_y_estudio(cls, rol, estudio_id):
+        query = """
+            SELECT u.*, e.id as estudio_id, e.nombre as estudio_nombre 
+            FROM usuarios u
+            LEFT JOIN estudios e ON u.estudio_id = e.id
+            WHERE u.rol = %(rol)s AND u.estudio_id = %(estudio_id)s
+        """
+        resultados = connectToMySQL('incautaciones_judiciales_db').query_db(query, {
+            'rol': rol,
+            'estudio_id': estudio_id
+        })
+        usuarios = []
+        for usuario in resultados:
+            usuarios.append(cls(usuario))
+        return usuarios
+
+    @classmethod
     def save(cls, data):
         query = """
             INSERT INTO usuarios (rut, nombre, email, password, rol, estudio_id)
             VALUES (%(rut)s, %(nombre)s, %(email)s, %(password)s, %(rol)s, %(estudio_id)s);
         """
         return connectToMySQL('incautaciones_judiciales_db').query_db(query, data)
+
+    @classmethod
+    def get_by_id(cls, id):
+        query = """
+            SELECT u.*, e.id as estudio_id, e.nombre as estudio_nombre 
+            FROM usuarios u
+            LEFT JOIN estudios e ON u.estudio_id = e.id
+            WHERE u.id = %(id)s;
+        """
+        results = connectToMySQL('incautaciones_judiciales_db').query_db(query, {'id': id})
+        return cls(results[0]) if results else None
 
     @classmethod
     def delete(cls, usuario_id):

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalles del Juicio{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('abogado_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('abogado_juicios') }}">Juicios</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Detalles del Juicio</li>
+                </ol>
+            </nav>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">Juicio #{{ juicio.id }}</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3 class="h5">Información General</h3>
+                            <dl class="row">
+                                <dt class="col-sm-4">ID Pagaré</dt>
+                                <dd class="col-sm-8">{{ juicio.id_pagare }}</dd>
+
+                                <dt class="col-sm-4">Rol</dt>
+                                <dd class="col-sm-8">{{ juicio.rol }}</dd>
+
+                                <dt class="col-sm-4">Tribunal</dt>
+                                <dd class="col-sm-8">{{ juicio.tribunal }}</dd>
+
+                                <dt class="col-sm-4">Cuantía</dt>
+                                <dd class="col-sm-8">${{ "{:,.0f}".format(juicio.cuantia) }}</dd>
+
+                                <dt class="col-sm-4">Estado</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge {% if juicio.estado == 'Pendiente' %}bg-warning
+                                                 {% elif juicio.estado == 'Asignado' %}bg-info
+                                                 {% else %}bg-success{% endif %}">
+                                        {{ juicio.estado }}
+                                    </span>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <h3 class="h5">Asignaciones</h3>
+                            <dl class="row">
+                                <dt class="col-sm-4">Estudio</dt>
+                                <dd class="col-sm-8">{{ juicio.estudio.nombre if juicio.estudio else 'No asignado' }}</dd>
+
+                                <dt class="col-sm-4">Abogado</dt>
+                                <dd class="col-sm-8">{{ juicio.abogado.nombre if juicio.abogado else 'No asignado' }}</dd>
+
+                                <dt class="col-sm-4">Incautador</dt>
+                                <dd class="col-sm-8">{{ juicio.incautador.nombre if juicio.incautador else 'No asignado' }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('abogado_juicios') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

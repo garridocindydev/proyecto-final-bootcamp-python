@@ -67,15 +67,15 @@
                     Entrar como Financiera
                   </button>
                   <button
-                  type="button"
-                  onclick="loginAs('abogado')"
-                  class="btn btn-outline-info"
-                >
-                  Entrar como Super Abogado
-                </button>
-                  <button
                     type="button"
                     onclick="loginAs('super_abogado')"
+                    class="btn btn-outline-info"
+                  >
+                    Entrar como Super Abogado
+                  </button>
+                  <button
+                    type="button"
+                    onclick="loginAs('abogado')"
                     class="btn btn-outline-info"
                   >
                     Entrar como Abogado
@@ -96,18 +96,18 @@
     </div>
     <script>
       const credentials = {
-        admin: { rut: 'admin', password: 'JUAN1234' },
-        financiera: { rut: '18464349-9', password: 'lore1234' },
-        super_abogado: { rut: '17271500-1', password: 'lore1234' },
-        abogado: { rut: '17271500-1', password: 'lore1234' },
-        incautador: { rut: '8808226-6', password: 'lore1234' }
+        admin: { rut: "admin", password: "JUAN1234" },
+        financiera: { rut: "12345678-5", password: "JUAN1234" },
+        super_abogado: { rut: "20319108-1", password: "JUAN1234" },
+        abogado: { rut: "13677708-4", password: "JUAN1234" },
+        incautador: { rut: "8235617-7", password: "JUAN1234" },
       };
 
       function loginAs(role) {
         const cred = credentials[role];
-        document.getElementById('rut').value = cred.rut;
-        document.getElementById('password').value = cred.password;
-        document.getElementById('loginForm').submit();
+        document.getElementById("rut").value = cred.rut;
+        document.getElementById("password").value = cred.password;
+        document.getElementById("loginForm").submit();
       }
     </script>
   </body>

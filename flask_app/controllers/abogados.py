@@ -1,8 +1,8 @@
-from flask import render_template, redirect, request, session, flash
+from flask import render_template, redirect, request, session, flash, jsonify
 from flask_app import app
 from flask_app.models.juicio import Juicio
 from flask_app.models.usuario import Usuario
-from flask_app.models.mensaje import Mensaje
+from flask_app.models.notificacion import Notificacion
 
 @app.route('/abogado/dashboard')
 def ver_dashboard_abogado():
@@ -11,7 +11,9 @@ def ver_dashboard_abogado():
     
     # Obtener los juicios asignados al abogado
     juicios = Juicio.obtener_por_abogado(session['usuario_id'])
-    return render_template('abogado/dashboard.html', juicios=juicios)
+    # Obtener el conteo de notificaciones no leídas
+    notificaciones_count = Notificacion.contar_no_leidas(session['usuario_id'])
+    return render_template('abogado/dashboard.html', juicios=juicios, notificaciones_count=notificaciones_count)
 
 @app.route('/abogado/juicios')
 def abogado_juicios():
@@ -26,7 +28,13 @@ def abogado_juicios():
     
     incautadores = Usuario.get_by_role('incautador')
     abogados = Usuario.get_by_role('abogado')  # Get list of attorneys
-    return render_template('abogado/juicios.html',rol_usuario=session.get('rol'), juicios=juicios, incautadores=incautadores, abogados=abogados)
+    notificaciones_count = Notificacion.contar_no_leidas(session['usuario_id'])
+    return render_template('abogado/juicios.html',
+                         rol_usuario=session.get('rol'),
+                         juicios=juicios,
+                         incautadores=incautadores,
+                         abogados=abogados,
+                         notificaciones_count=notificaciones_count)
 
 @app.route('/abogado/juicios/<int:juicio_id>/asignar_incautador', methods=['POST'])
 def asignar_incautador(juicio_id):
@@ -58,8 +66,10 @@ def ver_comentarios_incautador():
     # Obtener las asignaciones y sus comentarios para el abogado
     from flask_app.models.asignacion import Asignacion
     asignaciones = Asignacion.get_asignaciones_con_comentarios(session['usuario_id'])
-    return render_template('abogado/comentarios.html', asignaciones=asignaciones)
-    return redirect('/abogado/juicios')
+    notificaciones_count = Notificacion.contar_no_leidas(session['usuario_id'])
+    return render_template('abogado/comentarios.html',
+                         asignaciones=asignaciones,
+                         notificaciones_count=notificaciones_count)
 
 @app.route('/abogado/mensajes/<int:juicio_id>')
 def ver_mensajes(juicio_id):
@@ -68,4 +78,39 @@ def ver_mensajes(juicio_id):
     
     mensajes = Mensaje.obtener_por_juicio(juicio_id)
     juicio = Juicio.obtener_por_id(juicio_id)
-    return render_template('abogado/mensajes.html', mensajes=mensajes, juicio=juicio)
+    notificaciones_count = Notificacion.contar_no_leidas(session['usuario_id'])
+    return render_template('abogado/mensajes.html',
+                         mensajes=mensajes,
+                         juicio=juicio,
+                         notificaciones_count=notificaciones_count)
+
+@app.route('/abogado/notificaciones')
+def obtener_notificaciones():
+    if 'usuario_id' not in session:
+        return jsonify([])
+    
+    notificaciones = Notificacion.obtener_no_leidas(session['usuario_id'])
+    notificaciones_json = []
+    
+    for notif in notificaciones:
+        if notif.comentario:
+            fecha = notif.created_at.strftime('%d/%m/%Y %H:%M') if notif.created_at else ''
+            
+            notificaciones_json.append({
+                'id': notif.id,
+                'mensaje': notif.comentario.comentario,
+                'incautador': notif.comentario.incautador_nombre,
+                'asignacion_id': notif.comentario.asignacion_id,
+                'tipo': notif.comentario.tipo_comentario,
+                'fecha': fecha
+            })
+    
+    return jsonify(notificaciones_json)
+
+@app.route('/abogado/notificaciones/<int:notificacion_id>/leer', methods=['POST'])
+def marcar_notificacion_leida(notificacion_id):
+    if 'usuario_id' not in session or session.get('rol') not in ['abogado', 'super_abogado']:
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    Notificacion.marcar_como_leida(notificacion_id)
+    return jsonify({'success': True})

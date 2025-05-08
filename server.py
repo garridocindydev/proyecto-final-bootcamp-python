@@ -1,4 +1,6 @@
 from flask_app import app #Importamos la app de la carpeta flask_app
+
+# Importación de controladores
 from flask_app.controllers import usuarios
 from flask_app.controllers import financieras
 from flask_app.controllers import estudios

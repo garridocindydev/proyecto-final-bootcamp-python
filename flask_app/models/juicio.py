@@ -62,7 +62,7 @@ class Juicio:
             SELECT j.id as juicio_id, j.id_pagare, j.tribunal,j.abogado_id,j.cuantia,
         j.estado, e.id as estudio_id,e.nombre as nombre_estudio
         FROM juicios j
-        INNER JOIN estudios e ON j.estudio = e.id
+        LEFT JOIN estudios e ON j.estudio = e.id
         ORDER BY j.created_at DESC
         """
         resultados = MySQLConnection('incautaciones_judiciales_db').query_db(query)

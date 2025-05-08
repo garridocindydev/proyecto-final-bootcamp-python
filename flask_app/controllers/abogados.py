@@ -26,18 +26,17 @@ def abogado_juicios():
     
     incautadores = Usuario.get_by_role('incautador')
     abogados = Usuario.get_by_role('abogado')  # Get list of attorneys
-    return render_template('abogado/juicios.html', juicios=juicios, incautadores=incautadores, abogados=abogados)
+    return render_template('abogado/juicios.html',rol_usuario=session.get('rol'), juicios=juicios, incautadores=incautadores, abogados=abogados)
 
 @app.route('/abogado/juicios/<int:juicio_id>/asignar_incautador', methods=['POST'])
 def asignar_incautador(juicio_id):
     if 'usuario_id' not in session or session.get('rol') not in ['abogado', 'super_abogado']:
         return redirect('/')
     
-    juicio_id = request.form['juicio_id']
     incautador_id = request.form['incautador_id']
     
     Juicio.asignar_incautador(juicio_id, incautador_id)
-    flash('Incautador asignado exitosamente', 'success')
+    flash('Incautador actualizado exitosamente', 'success')
     return redirect('/abogado/juicios')
 
 @app.route('/asignar_abogado/juicios/<int:juicio_id>', methods=['POST'])

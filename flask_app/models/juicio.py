@@ -5,16 +5,22 @@ from flask_app.models.usuario import Usuario
 
 class Juicio:
     def __init__(self, data):
-        self.id = data['id']
-        self.id_pagare = data['id_pagare']
-        self.rol = data['rol']
-        self.tribunal = data['tribunal']
-        self.cuantia = data['cuantia']
+        self.id = data.get('id')
+        self.id_pagare = data.get('id_pagare')
+        self.rol = data.get('rol', None)
+        self.tribunal = data.get('tribunal', None)
+        self.cuantia = data.get('cuantia', None)
         self.estado = data.get('estado', 'Pendiente')
-        self.created_at = data.get('created_at')
-        self.updated_at = data.get('updated_at')
-        self.abogado_id = data.get('abogado_id')
-        self.incautador_id = data.get('incautador_id')
+        self.created_at = data.get('created_at', None)
+        self.updated_at = data.get('updated_at', None)
+        self.abogado_id = data.get('abogado_id', None)
+        self.abogado_nombre = data.get('abogado_nombre', None)
+        self.abogado_email = data.get('abogado_email', None)
+        self.incautador_id = data.get('incautador_id', None)
+        self.incautador_nombre = data.get('incautador_nombre', None)
+        self.incautador_email = data.get('incautador_email', None)
+        self.estudio_id = data.get('estudio_id', None)
+        self.nombre_estudio = data.get('nombre_estudio', None)
         
         # Objeto Estudio
         if 'estudio_id' in data and data['estudio_id']:
@@ -59,25 +65,45 @@ class Juicio:
     @classmethod
     def obtener_todos(cls):
         query = """
-            SELECT j.id as juicio_id, j.id_pagare, j.tribunal,j.abogado_id,j.cuantia,
-        j.estado, e.id as estudio_id,e.nombre as nombre_estudio
-        FROM juicios j
-        LEFT JOIN estudios e ON j.estudio = e.id
-        ORDER BY j.created_at DESC
+            SELECT j.id as juicio_id, j.id_pagare, j.tribunal, j.abogado_id, j.cuantia,
+                j.estado, j.rol, j.incautador_id,
+                e.id as estudio_id, e.nombre as nombre_estudio,
+                i.nombre as incautador_nombre, i.email as incautador_email,
+                a.nombre as abogado_nombre, a.email as abogado_email
+            FROM juicios j
+            LEFT JOIN estudios e ON j.estudio = e.id
+            LEFT JOIN usuarios i ON j.incautador_id = i.id
+            LEFT JOIN usuarios a ON j.abogado_id = a.id
+            ORDER BY j.created_at DESC
         """
         resultados = MySQLConnection('incautaciones_judiciales_db').query_db(query)
         juicios = []
         for juicio in resultados:
-            juicios.append(juicio)
+            
+            juicios.append(Juicio({
+                'id': juicio['juicio_id'],
+                'id_pagare': juicio['id_pagare'],
+                'tribunal': juicio['tribunal'],
+                'cuantia': juicio['cuantia'],
+                'estado': juicio['estado'],
+                'abogado_id': juicio['abogado_id'],
+                'abogado_nombre': juicio['abogado_nombre'],
+                'estudio_id': juicio['estudio_id'],
+                'nombre_estudio': juicio['nombre_estudio'],
+                'rol': juicio['rol'],
+                'incautador_id': juicio.get('incautador_id'),
+                'incautador_nombre': juicio.get('incautador_nombre'),
+                'incautador_email': juicio.get('incautador_email')
+            }))
         return juicios
         
     @classmethod
     def obtener_por_estudio(cls, estudio_id):
         query = """
-            SELECT j.*
-            FROM juicios j
-            WHERE j.estudio = %(estudio_id)s
-            ORDER BY j.created_at DESC
+        SELECT j.*
+        FROM juicios j
+        WHERE j.estudio = %(estudio_id)s
+        ORDER BY j.created_at DESC
         """
         resultados = MySQLConnection('incautaciones_judiciales_db').query_db(query, {'estudio_id': estudio_id})
         juicios = []
@@ -112,10 +138,12 @@ class Juicio:
         query = """
             SELECT j.*, 
                 e.id as estudio_id, e.nombre as estudio_nombre,
-                a.id as abogado_id, a.nombre as abogado_nombre, a.email as abogado_email
+                a.id as abogado_id, a.nombre as abogado_nombre, a.email as abogado_email,
+                i.id as incautador_id, i.nombre as incautador_nombre, i.email as incautador_email
             FROM juicios j
             LEFT JOIN estudios e ON j.estudio = e.id
             LEFT JOIN usuarios a ON j.abogado_id = a.id
+            LEFT JOIN usuarios i ON j.incautador_id = i.id
             WHERE j.abogado_id = %(abogado_id)s
             ORDER BY j.created_at DESC
         """

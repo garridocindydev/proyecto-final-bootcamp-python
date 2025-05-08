@@ -31,23 +31,45 @@ content %}
                   <th>Rol</th>
                   <th>Tribunal</th>
                   <th>Cuantía</th>
+                  {% if rol_usuario == 'super_abogado' %}
+                  <th>Abogado</th>
+                  {% endif %}
                   <th>Estado</th>
+                  <th>Incautador</th>
                   <th>Acciones</th>
+                  
                 </tr>
               </thead>
               <tbody>
                 {% for juicio in juicios %}
+                
                 <tr>
                   <td>{{ juicio.id_pagare }}</td>
                   <td>{{ juicio.rol }}</td>
                   <td>{{ juicio.tribunal }}</td>
                   <td>${{ "{:,.0f}".format(juicio.cuantia) }}</td>
+                  {% if rol_usuario == 'super_abogado' %}
+                  <td>
+                    {% if juicio.abogado_nombre %}
+                      {{ juicio.abogado_nombre }}
+                    {% else %}
+                      Sin asignar
+                    {% endif %}
+                  </td>
+                  {% endif %}
                   <td>
                     <span
                       class="badge {% if juicio.estado == 'Pendiente' %}bg-warning {% elif juicio.estado == 'Asignado' %}bg-info {% else %}bg-success{% endif %}"
                     >
                       {{ juicio.estado }}
                     </span>
+                  </td>
+                  <td>
+                    {% if juicio.incautador_nombre %}
+                      {{ juicio.incautador_nombre }}
+                    {% else %}
+                      Sin asignar
+                    {% endif %}
                   </td>
                   <td>
                     <div class="btn-group" role="group">
@@ -68,6 +90,83 @@ content %}
                         <i class="fas fa-user-plus"></i> Asignar Abogado
                       </button>
                       {% endif %}
+
+                      <button
+                        type="button"
+                        class="btn btn-info btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#asignarIncautadorModal{{ juicio.id }}"
+                      >
+                        <i class="fas fa-user{% if juicio.incautador_nombre %}-edit{% else %}-plus{% endif %}"></i>
+                        {% if juicio.incautador_nombre %}Editar{% else %}Asignar{% endif %} Incautador
+                      </button>
+                    </div>
+
+                    <!-- Modal para asignar incautador -->
+                    <div
+                      class="modal fade"
+                      id="asignarIncautadorModal{{ juicio.id }}"
+                      tabindex="-1"
+                      aria-labelledby="asignarIncautadorModalLabel{{ juicio.id }}"
+                      aria-hidden="true"
+                    >
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5
+                              class="modal-title"
+                              id="asignarIncautadorModalLabel{{ juicio.id }}"
+                            >
+                              Asignar Incautador al Juicio #{{ juicio.id }}
+                            </h5>
+                            <button
+                              type="button"
+                              class="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                            ></button>
+                          </div>
+                          <form
+                            action="{{ url_for('asignar_incautador', juicio_id=juicio.id) }}"
+                            method="POST"
+                          >
+                            <div class="modal-body">
+                              <div class="mb-3">
+                                <label for="incautador_id" class="form-label"
+                                  >Seleccionar Incautador</label
+                                >
+                                <select
+                                  name="incautador_id"
+                                  id="incautador_id"
+                                  class="form-select"
+                                  required
+                                >
+                                  <option value="">
+                                    Seleccione un incautador
+                                  </option>
+                                  {% for incautador in incautadores %}
+                                  <option value="{{ incautador.id }}" {% if juicio.incautador_id == incautador.id %}selected{% endif %}>
+                                    {{ incautador.nombre }}
+                                  </option>
+                                  {% endfor %}
+                                </select>
+                              </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button
+                                type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal"
+                              >
+                                Cancelar
+                              </button>
+                              <button type="submit" class="btn btn-primary">
+                                Asignar
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
                     </div>
 
                     {% if session.rol == 'super_abogado' and not juicio.abogado

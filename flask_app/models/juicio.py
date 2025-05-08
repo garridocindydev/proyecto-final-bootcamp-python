@@ -59,14 +59,16 @@ class Juicio:
     @classmethod
     def obtener_todos(cls):
         query = """
-            SELECT j.*
-            FROM juicios j
-            ORDER BY j.created_at DESC
+            SELECT j.id as juicio_id, j.id_pagare, j.tribunal,j.abogado_id,j.cuantia,
+        j.estado, e.id as estudio_id,e.nombre as nombre_estudio
+        FROM juicios j
+        INNER JOIN estudios e ON j.estudio = e.id
+        ORDER BY j.created_at DESC
         """
         resultados = MySQLConnection('incautaciones_judiciales_db').query_db(query)
         juicios = []
         for juicio in resultados:
-            juicios.append(cls(juicio))
+            juicios.append(juicio)
         return juicios
         
     @classmethod

@@ -47,10 +47,68 @@
                   </button>
                 </div>
               </form>
+
+              <!-- Accesos Rápidos -->
+              <div class="mt-4">
+                <h5 class="text-center mb-3">Accesos Rápidos</h5>
+                <div class="d-grid gap-2">
+                  <button
+                    type="button"
+                    onclick="loginAs('admin')"
+                    class="btn btn-outline-dark"
+                  >
+                    Entrar como Administrador
+                  </button>
+                  <button
+                    type="button"
+                    onclick="loginAs('financiera')"
+                    class="btn btn-outline-success"
+                  >
+                    Entrar como Financiera
+                  </button>
+                  <button
+                  type="button"
+                  onclick="loginAs('abogado')"
+                  class="btn btn-outline-info"
+                >
+                  Entrar como Super Abogado
+                </button>
+                  <button
+                    type="button"
+                    onclick="loginAs('super_abogado')"
+                    class="btn btn-outline-info"
+                  >
+                    Entrar como Abogado
+                  </button>
+                  <button
+                    type="button"
+                    onclick="loginAs('incautador')"
+                    class="btn btn-outline-warning"
+                  >
+                    Entrar como Incautador
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <script>
+      const credentials = {
+        admin: { rut: 'admin', password: 'JUAN1234' },
+        financiera: { rut: '18464349-9', password: 'lore1234' },
+        super_abogado: { rut: '17271500-1', password: 'lore1234' },
+        abogado: { rut: '17271500-1', password: 'lore1234' },
+        incautador: { rut: '8808226-6', password: 'lore1234' }
+      };
+
+      function loginAs(role) {
+        const cred = credentials[role];
+        document.getElementById('rut').value = cred.rut;
+        document.getElementById('password').value = cred.password;
+        document.getElementById('loginForm').submit();
+      }
+    </script>
   </body>
 </html>

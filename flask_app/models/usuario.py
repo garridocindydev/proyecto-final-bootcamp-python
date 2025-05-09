@@ -29,52 +29,16 @@ class Usuario:
         if not rut:
             return False
             
-        # Remover puntos y guión
-        rut = rut.replace(".", "").replace("-", "").upper()
-        
-        # Verificar longitud
-        if len(rut) < 8 or len(rut) > 9:
+        # Verificar formato básico (8-9 dígitos + guión + dígito verificador)
+        if not re.match(r'^\d{7,8}-[0-9kK]$', rut):
             return False
-
-        # Verificar que todos los caracteres son válidos
-        if not re.match(r'^[0-9]+[0-9K]$', rut):
+            
+        # Verificar rango básico
+        numero = rut.split('-')[0]
+        if not (1000000 <= int(numero) <= 99999999):
             return False
-
-        # Separar número y dígito verificador
-        numero = rut[:-1]
-        dv = rut[-1]
-        
-        try:
-            # Convertir a integer
-            num = int(numero)
             
-            # Validar rango
-            if num < 1000000 or num > 99999999:
-                return False
-                
-            # Calcular dígito verificador
-            suma = 0
-            multiplicador = 2
-            
-            # Recorrer cada dígito de derecha a izquierda
-            for d in reversed(numero):
-                suma += int(d) * multiplicador
-                multiplicador = multiplicador + 1 if multiplicador < 7 else 2
-            
-            # Calcular dígito verificador esperado
-            resto = suma % 11
-            dv_esperado = str(11 - resto)
-            
-            if dv_esperado == '11':
-                dv_esperado = '0'
-            elif dv_esperado == '10':
-                dv_esperado = 'K'
-                
-            # Comparar dígito verificador
-            return dv == dv_esperado
-            
-        except ValueError:
-            return False
+        return True
 
     @staticmethod
     def validar_usuario(usuario):

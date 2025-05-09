@@ -33,6 +33,21 @@
                         {% endif %}
                     </ul>
                     <ul class="navbar-nav">
+                        {% if session.get('rol') in ['abogado', 'super_abogado'] %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-bell"></i>
+                                {% if notificaciones_count > 0 %}
+                                <span class="badge rounded-pill bg-danger" id="notificacionesBadge">{{ notificaciones_count }}</span>
+                                {% endif %}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" id="notificacionesLista" style="width: 300px">
+                                <li>
+                                    <p class="dropdown-item text-center" id="noNotificaciones">No hay notificaciones nuevas</p>
+                                </li>
+                            </ul>
+                        </li>
+                        {% endif %}
                         <li class="nav-item">
                             <form action="/logout" method="POST" class="d-inline">
                                 <button type="submit" class="btn btn-link nav-link">Cerrar Sesión</button>
@@ -50,5 +65,99 @@
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% if session.get('rol') in ['abogado', 'super_abogado'] %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const notificacionesLista = document.getElementById('notificacionesLista');
+        const noNotificaciones = document.getElementById('noNotificaciones');
+        const badgeElement = document.getElementById('notificacionesBadge');
+        let notificacionesCount = {{ notificaciones_count|default(0) }};
+
+        function actualizarNotificaciones() {
+            fetch('/abogado/notificaciones')
+                .then(response => response.json())
+                .then(notificaciones => {
+                    notificacionesLista.innerHTML = '';
+                    if (notificaciones.length === 0) {
+                        notificacionesLista.appendChild(noNotificaciones);
+                    } else {
+                        notificaciones.forEach(notif => {
+                            const li = document.createElement('li');
+                            const tipoBadgeClass = {
+                                'Avance': 'bg-info',
+                                'Problema': 'bg-danger',
+                                'Éxito': 'bg-success',
+                                'Otro': 'bg-secondary'
+                            }[notif.tipo] || 'bg-secondary';
+
+                            li.innerHTML = `
+                                <div class="dropdown-item border-bottom py-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge ${tipoBadgeClass} me-2">${notif.tipo}</span>
+                                        <button class="btn btn-sm btn-link text-success marcar-leida"
+                                                data-id="${notif.id}">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">De: ${notif.incautador}</small>
+                                    </div>
+                                    <p class="mb-2" style="white-space: normal;">${notif.mensaje}</p>
+                                    <div class="text-end">
+                                        <small class="text-muted">${notif.fecha}</small>
+                                    </div>
+                                </div>
+                            `;
+                            notificacionesLista.appendChild(li);
+                        });
+                    }
+                });
+        }
+
+        // Actualizar notificaciones cada 30 segundos
+        actualizarNotificaciones();
+        setInterval(actualizarNotificaciones, 30000);
+
+        // Marcar notificación como leída
+        notificacionesLista.addEventListener('click', function(e) {
+            if (e.target.closest('.marcar-leida')) {
+                const btn = e.target.closest('.marcar-leida');
+                const notifId = btn.dataset.id;
+                fetch(`/abogado/notificaciones/${notifId}/leer`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        btn.closest('.dropdown-item').remove();
+                        notificacionesCount--;
+
+                        // Actualizar el contador en el badge
+                        if (notificacionesCount <= 0) {
+                            notificacionesLista.innerHTML = '';
+                            notificacionesLista.appendChild(noNotificaciones);
+                            if (badgeElement) {
+                                badgeElement.remove();
+                            }
+                        } else {
+                            if (badgeElement) {
+                                badgeElement.textContent = notificacionesCount;
+                            } else {
+                                // Si el badge no existe y hay notificaciones, crearlo
+                                const newBadge = document.createElement('span');
+                                newBadge.id = 'notificacionesBadge';
+                                newBadge.className = 'badge rounded-pill bg-danger';
+                                newBadge.textContent = notificacionesCount;
+                                document.querySelector('.nav-link.dropdown-toggle').appendChild(newBadge);
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    });
+    </script>
+    {% endif %}
 </body>
 </html>

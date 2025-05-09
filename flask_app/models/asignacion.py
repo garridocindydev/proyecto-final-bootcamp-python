@@ -1,6 +1,7 @@
 from flask_app.config.my_sql_conection import connectToMySQL
 from flask import flash
 from datetime import datetime
+from flask_app.models.notificacion import Notificacion
 
 class Asignacion:
     def __init__(self, data):
@@ -122,12 +123,32 @@ class Comentario:
 
     @classmethod
     def crear(cls, data):
+        # Insertar el comentario
         query = """
             INSERT INTO comentarios_incautador
             (asignacion_id, incautador_id, comentario, tipo_comentario)
             VALUES (%(asignacion_id)s, %(incautador_id)s, %(comentario)s, %(tipo_comentario)s)
         """
-        return connectToMySQL('incautaciones_judiciales_db').query_db(query, data)
+        comentario_id = connectToMySQL('incautaciones_judiciales_db').query_db(query, data)
+        
+        # Obtener la asignación para saber quién es el abogado
+        query = """
+            SELECT aj.abogado_id
+            FROM asignaciones_juicios aj
+            WHERE aj.id = %(asignacion_id)s
+        """
+        result = connectToMySQL('incautaciones_judiciales_db').query_db(query, {'asignacion_id': data['asignacion_id']})
+        
+        if result and result[0]['abogado_id']:
+            # Crear notificación para el abogado
+            
+            notificacion_data = {
+                'comentario_id': comentario_id,
+                'abogado_id': result[0]['abogado_id']
+            }
+            Notificacion.crear_notificacion(notificacion_data)
+        
+        return comentario_id
 
     @classmethod
     def get_by_asignacion(cls, asignacion_id):
@@ -142,6 +163,6 @@ class Comentario:
         comentarios = []
         for row in results:
             comentario = cls(row)
-            comentario.incautador_nombre = row['incautador_nombre']
+            comentario.incautador_id = row['incautador_id']
             comentarios.append(comentario)
         return comentarios

@@ -3,6 +3,7 @@ from flask_app import app
 from flask_app.models.usuario import Usuario
 from flask_app.models.estudio import Estudio
 from flask_app.models.juicio import Juicio
+from flask_app.models.notificacion import Notificacion
 from flask_bcrypt import Bcrypt
 from functools import wraps
 
@@ -52,6 +53,9 @@ def abogado_dashboard():
     if 'usuario_id' not in session or session.get('rol') not in ['abogado', 'super_abogado']:
         return redirect('/')
     
+    # Obtener el conteo de notificaciones no leídas
+    notificaciones_count = Notificacion.contar_no_leidas(session['usuario_id'])
+    
     # Obtener el usuario actual
     usuario = Usuario.get_by_id(session['usuario_id'])
     
@@ -69,7 +73,8 @@ def abogado_dashboard():
     return render_template('abogado/dashboard.html',
                            total_juicios=total_juicios,
                            juicios_pendientes=juicios_pendientes,
-                           juicios_asignados=juicios_asignados)
+                           juicios_asignados=juicios_asignados,
+                           notificaciones_count=notificaciones_count)
 
 @app.route('/usuarios/abogado/juicios')
 def usuario_abogado_juicios():

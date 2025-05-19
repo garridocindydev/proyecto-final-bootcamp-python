@@ -42,8 +42,13 @@ def asignar_incautador(juicio_id):
         return redirect('/')
     
     incautador_id = request.form['incautador_id']
+    patente_vehiculo = request.form['patente_vehiculo']
     
-    Juicio.asignar_incautador(juicio_id, incautador_id)
+    if not patente_vehiculo:
+        flash('La patente del vehículo es requerida', 'error')
+        return redirect('/abogado/juicios')
+    
+    Juicio.asignar_incautador(juicio_id, incautador_id, patente_vehiculo)
     flash('Incautador actualizado exitosamente', 'success')
     return redirect('/abogado/juicios')
 

@@ -108,7 +108,7 @@ def ver_juicio(juicio_id):
         flash('Juicio no encontrado', 'error')
         return redirect('/abogado/juicios')
     
-    return render_template('abogado/ver_juicio.html', juicio=juicio)
+    return render_template('abogado/ver_juicio.html', juicio=juicio,notificaciones_count=Notificacion.contar_no_leidas(session['usuario_id']))
 
 @app.route('/dashboard')
 def dashboard():
@@ -149,7 +149,7 @@ def crear_usuario():
         'email': request.form['email'],
         'password': pw_hash,
         'rol': request.form['rol'],
-        'estudio_id': request.form.get('estudio_id') if request.form['rol'] == 'abogado' else None
+        'estudio_id': request.form.get('estudio_id') if request.form['rol']  in ['abogado', 'super_abogado'] else None
     }
     
     Usuario.save(data)

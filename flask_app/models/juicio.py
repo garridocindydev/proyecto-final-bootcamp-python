@@ -170,15 +170,43 @@ class Juicio:
         return cls(resultado[0]) if resultado else None
 
     @classmethod
-    def asignar_incautador(cls, juicio_id, incautador_id):
-        query = """
+    def asignar_incautador(cls, juicio_id, incautador_id, patente_vehiculo):
+        # Primero obtenemos el abogado_id del juicio
+        query_juicio = """
+            SELECT j.abogado_id
+            FROM juicios j
+            WHERE j.id = %(juicio_id)s
+        """
+        resultado = MySQLConnection('incautaciones_judiciales_db').query_db(query_juicio, {'juicio_id': juicio_id})
+        
+        if not resultado or not resultado[0]['abogado_id']:
+            return False
+            
+        abogado_id = resultado[0]['abogado_id']
+        
+        # Actualizamos el juicio
+        query_update = """
             UPDATE juicios 
-            SET incautador_id = %(incautador_id)s
+            SET incautador_id = %(incautador_id)s,
+                estado = 'Asignado'
             WHERE id = %(juicio_id)s
         """
-        return MySQLConnection('incautaciones_judiciales_db').query_db(query, {
+        MySQLConnection('incautaciones_judiciales_db').query_db(query_update, {
             'juicio_id': juicio_id,
             'incautador_id': incautador_id
+        })
+        
+        # Creamos la asignación
+        query_asignacion = """
+            INSERT INTO asignaciones_juicios
+            (juicio_id, abogado_id, incautador_id, patente_vehiculo, estado)
+            VALUES (%(juicio_id)s, %(abogado_id)s, %(incautador_id)s, %(patente_vehiculo)s, 'Pendiente')
+        """
+        return MySQLConnection('incautaciones_judiciales_db').query_db(query_asignacion, {
+            'juicio_id': juicio_id,
+            'abogado_id': abogado_id,
+            'incautador_id': incautador_id,
+            'patente_vehiculo': patente_vehiculo
         })
 
     @classmethod

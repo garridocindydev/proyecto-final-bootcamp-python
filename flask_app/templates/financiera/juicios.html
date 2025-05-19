@@ -100,7 +100,7 @@
               </button>
               {% endif %} {% if juicio.estado != 'Terminado' %}
               <form
-                action="/terminar_juicio/{{ juicio }}"
+                action="/financiera/juicios/terminar/{{ juicio.id }}"
                 method="POST"
                 style="display: inline"
               >

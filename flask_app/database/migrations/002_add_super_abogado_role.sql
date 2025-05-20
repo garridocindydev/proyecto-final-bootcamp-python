@@ -14,10 +14,7 @@ ADD CONSTRAINT chk_abogado_estudio CHECK (
     ((rol IN ('abogado', 'super_abogado')) AND estudio_id IS NOT NULL)
 );
 
--- Script para revertir los cambios en caso de error
-/*
--- Eliminamos la tabla usuarios
-DROP TABLE IF EXISTS usuarios;
+
 
 -- Restauramos la tabla desde el backup
 CREATE TABLE usuarios AS SELECT * FROM usuarios_backup;

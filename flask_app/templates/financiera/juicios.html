@@ -94,13 +94,13 @@
                 type="button"
                 class="btn btn-warning btn-sm"
                 data-bs-toggle="modal"
-                data-bs-target="#asignarModal{{ juicio.juicio_id }}"
+                data-bs-target="#asignarModal{{ juicio.id }}"
               >
                 Asignar
               </button>
               {% endif %} {% if juicio.estado != 'Terminado' %}
               <form
-                action="/terminar_juicio/{{ juicio.juicio_id }}"
+                action="/financiera/juicios/terminar/{{ juicio.id }}"
                 method="POST"
                 style="display: inline"
               >
@@ -115,7 +115,7 @@
           <!-- Modal para asignar estudio -->
           <div
             class="modal fade"
-            id="asignarModal{{ juicio.juicio_id }}"
+            id="asignarModal{{ juicio.id }}"
             tabindex="-1"
           >
             <div class="modal-dialog">
@@ -129,9 +129,8 @@
                   ></button>
                 </div>
                 <div class="modal-body">
-                  {{juicio}}
                   <form
-                    action="/financiera/juicios/asignar/{{ juicio.juicio_id }}"
+                    action="/financiera/juicios/asignar/{{ juicio.id }}"
                     method="POST"
                   >
                     <div class="mb-3">

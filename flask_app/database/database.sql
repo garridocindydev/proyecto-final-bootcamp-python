@@ -75,6 +75,18 @@ CREATE TABLE IF NOT EXISTS comentarios_incautador (
     FOREIGN KEY (incautador_id) REFERENCES usuarios(id)
 );
 
+-- Tabla de notificaciones
+CREATE TABLE IF NOT EXISTS notificaciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    mensaje TEXT NOT NULL,
+    tipo ENUM('info', 'warning', 'success', 'error') DEFAULT 'info',
+    leida BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+);
+
 -- Insertar datos de prueba
 
 -- Crear el usuario administrador inicial
@@ -112,10 +124,5 @@ INSERT INTO comentarios_incautador (asignacion_id, incautador_id, comentario, ti
 (1, 3, 'Iniciando búsqueda del vehículo', 'Avance'),
 (2, 3, 'Vehículo localizado en estacionamiento', 'Éxito'),
 (2, 3, 'Esperando grúa para el retiro', 'Avance');
-    -- Aseguramos que los abogados y super_abogados tengan estudio asignado
-    CONSTRAINT chk_abogado_estudio CHECK (
-        (rol NOT IN ('abogado', 'super_abogado')) OR 
-        ((rol IN ('abogado', 'super_abogado')) AND estudio_id IS NOT NULL)
-    )
-);
+
 
